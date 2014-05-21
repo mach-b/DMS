@@ -23,7 +23,7 @@ public class MulticastReceiver {
     try {
       //Prepare to join multicast group
       socket = new MulticastSocket(8888);
-      InetAddress address = InetAddress.getByName("224.2.2.3");
+      InetAddress address = InetAddress.getByName("255.255.255.255");
       socket.joinGroup(address);
  
       while (true) {
