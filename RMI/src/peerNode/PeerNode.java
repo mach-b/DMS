@@ -24,10 +24,12 @@ public class PeerNode {
     
     private InetAddress ipAddress;
     
-    private List<InetAddress> peerAddressList;  
+    private List<InetAddress> peerAddressList;  // if Leader, populate, else null??
     
     private RMIClient rmiClient;
     private RMIServer rmiServer;
+    
+    private DirectoryManager dirManager;
     
     
     
@@ -37,6 +39,8 @@ public class PeerNode {
         ipAddress = getIPAddress();
         peerAddressList = new ArrayList<>();
         peerAddressList.add(ipAddress);
+        dirManager = new DirectoryManager();
+        dirManager.createDefaultDirectory();
     }
     
     /**
@@ -78,7 +82,7 @@ public class PeerNode {
      * @param args
      * @throws UnknownHostException
      */
-    public static void main(String args[]) throws UnknownHostException {
+    public static void main(String[] args) throws UnknownHostException {
         PeerNode node = new PeerNode();
         System.out.println("IP address = " + node.ipAddress.toString());
     }

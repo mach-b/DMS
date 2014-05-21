@@ -6,12 +6,23 @@
 
 package peerNode;
 
+import java.io.File;
+
 /**
  *
  * @author markburton
  */
-public class LeaderElector {
+public class DirectoryManager {
     
+    /**
+     *
+     */ 
+    public void createDefaultDirectory() {
+        File dir = new File("RMIFileExchangeFolder");
+        dir.mkdir();
+        
+    }
     
+  
     
 }
