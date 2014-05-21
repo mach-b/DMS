@@ -72,4 +72,14 @@ public class PeerNode {
     private InetAddress getIPAddress() throws UnknownHostException {
        return InetAddress.getLocalHost();
     }
+    
+    /**
+     *
+     * @param args
+     * @throws UnknownHostException
+     */
+    public static void main(String args[]) throws UnknownHostException {
+        PeerNode node = new PeerNode();
+        System.out.println("IP address = " + node.ipAddress.toString());
+    }
 }
