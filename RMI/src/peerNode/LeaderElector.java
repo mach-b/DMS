@@ -4,12 +4,13 @@
  * and open the template in the editor.
  */
 
-package Multicast;
+package peerNode;
 
 /**
  *
  * @author markburton
  */
-public class MulticastSender {
+public class LeaderElector {
+    
     
 }
