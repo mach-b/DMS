@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
  *
  * @author markburton
  */
-public interface RMI extends Remote{
+public interface SharedFilesRMI extends Remote{
     
-    public String getString(String string) throws RemoteException;
+    public String[] getFileNames() throws RemoteException;
 }
