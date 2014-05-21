@@ -1,5 +1,6 @@
 package rmi;
 
+import java.io.File;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -10,4 +11,6 @@ import java.rmi.RemoteException;
 public interface SharedFilesRMI extends Remote{
     
     public String[] getFileNames() throws RemoteException;
+    
+    public File getFile(String fileName) throws RemoteException;
 }

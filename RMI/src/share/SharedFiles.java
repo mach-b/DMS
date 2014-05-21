@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -57,5 +56,18 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
     
     public boolean addFile(File file) {
         return files.add(file);
+    }
+
+    @Override
+    public File getFile(String fileName) throws RemoteException {
+        
+        Iterator filesIterator = files.iterator();
+        while (filesIterator.hasNext()) {
+            File file = (File)filesIterator.next();
+            if (file.getName().equals(fileName)) {
+                return file;
+            }
+        }
+        return null;
     }
 }

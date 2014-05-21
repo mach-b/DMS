@@ -119,6 +119,7 @@ public class ShareUI extends javax.swing.JFrame {
                 
                 System.out.println("File added:" + file.getName());
                 updateFileListLocal(sharedFiles.getFileNames());
+                //tell the leader the list has changed
             } else {
                 
                 System.out.println("File not added");
