@@ -36,4 +36,18 @@ public class RMIClient {
         }
     }
     
+    private void connectServer(String ipAddress) {
+        try {
+            Registry reg =  LocateRegistry.getRegistry(ipAddress, 1099);
+            //Registry reg =  LocateRegistry.getRegistry("127.0.0.1", 1099);
+            RMI rmi =  (RMI) reg.lookup("server");
+            System.out.println("Connected to server.");
+            String text = rmi.getString("Mark");
+            System.out.println(text);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    
+    
 }
