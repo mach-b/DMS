@@ -4,10 +4,13 @@ import java.io.File;
 import java.rmi.RemoteException;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
+import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @author kerrypowell
+ * The UI for sharing files between two or more applications over a local network
+ * 
+ * @author Kerry Powell
+ * @version 1.0
  */
 public class ShareUI extends javax.swing.JFrame {
     
@@ -23,12 +26,29 @@ public class ShareUI extends javax.swing.JFrame {
         sharedFiles = new SharedFiles();
     }
     
+    /**
+     * Updates the local files list
+     * 
+     * @param files the file names of all the files to set
+     */
     private void updateFileListLocal(String[] files) {
         
-        DefaultListModel list = new DefaultListModel();
+        DefaultListModel model = new DefaultListModel();
         for (String file: files)
-            list.addElement(file);
-        fileListLocal.setModel(list);
+            model.addElement(file);
+        fileListLocal.setModel(model);
+    }
+    
+    /**
+     * Update the remote files table
+     * 
+     * @param files the IP addresses and file names of all the files to set
+     */
+    public void updateFileListRemote(String[][] files) {
+        
+        String[] columnNames = {"IP", "Files Name"};
+        DefaultTableModel model = new DefaultTableModel(files, columnNames);
+        tblRemoteFiles.setModel(model);
     }
 
     /**
@@ -45,9 +65,9 @@ public class ShareUI extends javax.swing.JFrame {
         fileListLocal = new javax.swing.JList();
         btnSaveFile = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        fileListRemote = new javax.swing.JList();
         jLabel2 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblRemoteFiles = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,10 +84,33 @@ public class ShareUI extends javax.swing.JFrame {
 
         jLabel1.setText("  Local Files");
 
-        jScrollPane2.setViewportView(fileListRemote);
-
         jLabel2.setText("  Remote Files");
         jLabel2.setToolTipText("");
+
+        tblRemoteFiles.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "IP Address", "File Name"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tblRemoteFiles);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -76,16 +119,14 @@ public class ShareUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSaveFile)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)))
+                    .addComponent(jLabel1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLoadFile))
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnSaveFile)
+                    .addComponent(jLabel2)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -96,9 +137,9 @@ public class ShareUI extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLoadFile)
@@ -173,10 +214,10 @@ public class ShareUI extends javax.swing.JFrame {
     private javax.swing.JButton btnLoadFile;
     private javax.swing.JButton btnSaveFile;
     private javax.swing.JList fileListLocal;
-    private javax.swing.JList fileListRemote;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable tblRemoteFiles;
     // End of variables declaration//GEN-END:variables
 }
