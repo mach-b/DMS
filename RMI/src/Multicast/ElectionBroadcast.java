@@ -25,6 +25,7 @@ public class ElectionBroadcast extends Thread {
         DatagramPacket outPacket = null;
         byte[] outBuf;
         final int PORT = 8888;
+
         try {
             socket = new DatagramSocket();
             long counter = 0;
