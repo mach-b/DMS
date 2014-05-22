@@ -20,9 +20,6 @@ public class DirectoryManager {
     public void createDefaultDirectory() {
         File dir = new File("RMIFileExchangeFolder");
         dir.mkdir();
-        
     }
-    
-  
     
 }

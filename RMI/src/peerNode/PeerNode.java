@@ -6,12 +6,14 @@
 
 package peerNode;
 
+import Multicast.BroadcastListener;
+import Multicast.ElectionBroadcast;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import rmi.RMIClient;
-import rmi.RMIServer;
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * Represents a peer node
@@ -21,26 +23,26 @@ public class PeerNode {
     
     private boolean isLeader;
     private PeerNode leader;
-    
-    private InetAddress ipAddress;
-    
-    private List<InetAddress> peerAddressList;  // if Leader, populate, else null??
-    
-    private RMIClient rmiClient;
-    private RMIServer rmiServer;
-    
+    private boolean electionRunning;
+    private InetAddress ipAddress, leaderAddress;
+    private Set<InetAddress> peerAddressList;  // if Leader, populate, else null??
+    private int clock;
+    private BroadcastListener broadcastListener;
+    private ElectionBroadcast electionBroadcast;
     private DirectoryManager dirManager;
     
-    
-    
-    public PeerNode() throws UnknownHostException {
+    public PeerNode() throws UnknownHostException, RemoteException {
         isLeader = true; // On startup is only node so is leader.
         setAsLeader(); 
         ipAddress = getIPAddress();
-        peerAddressList = new ArrayList<>();
+        leaderAddress = getIPAddress();
+        peerAddressList = new HashSet<>();
         peerAddressList.add(ipAddress);
         dirManager = new DirectoryManager();
         dirManager.createDefaultDirectory();
+        clock = 0;
+        broadcastListener = new BroadcastListener();
+        electionBroadcast = new ElectionBroadcast();
     }
     
     /**
@@ -56,8 +58,8 @@ public class PeerNode {
      * @param listTwo
      * @return boolean success
      */
-    private boolean mergeLists(List listOne, List listTwo) {
-        return listOne.addAll(listTwo);
+    private boolean mergeSets(Set hsOne, Set hsTwo) {
+        return hsOne.addAll(hsTwo);
     }
     
     /**
@@ -82,7 +84,7 @@ public class PeerNode {
      * @param args
      * @throws UnknownHostException
      */
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws UnknownHostException, RemoteException {
         PeerNode node = new PeerNode();
         System.out.println("IP address = " + node.ipAddress.toString());
     }

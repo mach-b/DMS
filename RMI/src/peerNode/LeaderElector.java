@@ -6,11 +6,16 @@
 
 package peerNode;
 
+import java.net.InetAddress;
+
 /**
  *
  * @author markburton
  */
 public class LeaderElector {
+    
+    private InetAddress leader;
+    
     
     
     
