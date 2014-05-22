@@ -6,6 +6,7 @@
 
 package peerNode;
 
+import Multicast.BroadcastListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,12 +15,13 @@ import java.util.ArrayList;
 import rmi.LeaderRMI;
 
 /**
- * A class that handles finding the networks leader and electing the leader
+ * A class that handles finding the networks leader and electing the leader, is 
+ * the broadcast listener for dealing with elections
  * 
  * @author Kerry Powell
  * @version 1.0
  */
-public class Leader implements LeaderRMI{
+public class Leader extends BroadcastListener implements LeaderRMI{
     
     private String leaderIp = null;
     private boolean electingLeader = false;
@@ -28,8 +30,6 @@ public class Leader implements LeaderRMI{
     public Leader() {
         
         registerLeaderRMI(); //Register this RMI
-        
-         // Register as Broadcast Listener
         
          //See who is leader
         
@@ -111,6 +111,14 @@ public class Leader implements LeaderRMI{
     @Override
     public synchronized void updateFileNames(String ip, String[] fileNames) throws RemoteException {
         fileRegestry.add(new FileNameEntry(ip, fileNames));
+    }
+
+    @Override
+    public synchronized void broadcastRecieved(String message) {
+        System.out.println("Broadcast Recieved:" + message);
+        if (message.equals("Election Proposed")) {
+            startElection();
+        }
     }
     
     /**

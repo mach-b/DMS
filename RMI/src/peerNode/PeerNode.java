@@ -75,8 +75,14 @@ public class PeerNode {
         PeerNode node = new PeerNode();
         System.out.println("IP address = " + node.ipAddress.toString());
         
-        node.broadcastListener = new BroadcastListener();
-        node.broadcastListener.start();
+        node.broadcastListener = new BroadcastListener() {
+
+            @Override
+            public void broadcastRecieved(String message) {
+                System.out.println("Message Recieved:" + message);
+            }
+        };
+        //node.broadcastListener.start();
         System.out.println("BroadcastListener run in main.");
         
         node.callElection();

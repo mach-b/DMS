@@ -14,7 +14,11 @@ import java.net.MulticastSocket;
  *
  * @author markburton
  */
-public class BroadcastListener extends Thread {
+public abstract class BroadcastListener extends Thread {
+    
+    protected BroadcastListener(){
+        this.start();
+    }
 
     @Override
     public void run() {
@@ -32,7 +36,8 @@ public class BroadcastListener extends Thread {
                     inPacket = new DatagramPacket(inBuf, inBuf.length);
                     socket.receive(inPacket);
                     String msg = new String(inBuf, 0, inPacket.getLength());
-                    System.out.println("From " + inPacket.getAddress() + " Msg : " + msg);
+                    //System.out.println("From " + inPacket.getAddress() + " Msg : " + msg);
+                    broadcastRecieved(msg);
                 }
             } catch (IOException ioe) {
                 System.out.println(ioe);
@@ -43,5 +48,7 @@ public class BroadcastListener extends Thread {
             }
         }
     }
+    
+    abstract public void broadcastRecieved(String message);
 
 }
