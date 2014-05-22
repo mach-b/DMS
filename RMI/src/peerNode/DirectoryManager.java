@@ -25,8 +25,8 @@ public class DirectoryManager {
         dir.mkdir();
     }
     
-<<<<<<< HEAD
-=======
+//<<<<<<< HEAD
+//=======
     /**
      * Saves a file to the local directory
      * 
@@ -69,5 +69,5 @@ public class DirectoryManager {
         }
         return "Successfully added";
     }
->>>>>>> FETCH_HEAD
+//>>>>>>> FETCH_HEAD
 }

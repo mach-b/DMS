@@ -14,27 +14,34 @@ import java.net.MulticastSocket;
  *
  * @author markburton
  */
-public class BroadcastListener {
+public class BroadcastListener extends Thread {
 
-    public BroadcastListener() {
+    @Override
+    public void run() {
         MulticastSocket socket = null;
         DatagramPacket inPacket = null;
-        byte[] inBuf = new byte[2048];
-        try {
-            //Prepare to join multicast group
-            socket = new MulticastSocket(8888);
-            InetAddress address = InetAddress.getByName("224.2.2.3");
-            socket.joinGroup(address);
+        byte[] inBuf = new byte[1024];
+        while (true) {
+            try {
+                //Prepare to join multicast group
+                socket = new MulticastSocket(8888);
+                InetAddress address = InetAddress.getByName("224.2.2.3");
+                socket.joinGroup(address);
 
-            while (true) {
-                inPacket = new DatagramPacket(inBuf, inBuf.length);
-                socket.receive(inPacket);
-                String msg = new String(inBuf, 0, inPacket.getLength());
-                System.out.println("From " + inPacket.getAddress() + " Msg : " + msg);
+                while (true) {
+                    inPacket = new DatagramPacket(inBuf, inBuf.length);
+                    socket.receive(inPacket);
+                    String msg = new String(inBuf, 0, inPacket.getLength());
+                    System.out.println("From " + inPacket.getAddress() + " Msg : " + msg);
+                }
+            } catch (IOException ioe) {
+                System.out.println(ioe);
             }
-        } catch (IOException ioe) {
-            System.out.println(ioe);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+            }
         }
     }
-    
+
 }

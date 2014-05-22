@@ -22,7 +22,6 @@ import java.util.Set;
 public class PeerNode {
     
     private boolean isLeader;
-    private PeerNode leader;
     private boolean electionRunning;
     private InetAddress ipAddress, leaderAddress;
     private Set<InetAddress> peerAddressList;  // if Leader, populate, else null??
@@ -33,7 +32,7 @@ public class PeerNode {
     
     public PeerNode() throws UnknownHostException, RemoteException {
         isLeader = true; // On startup is only node so is leader.
-        setAsLeader(); 
+        //setAsLeader(); 
         ipAddress = getIPAddress();
         leaderAddress = getIPAddress();
         peerAddressList = new HashSet<>();
@@ -41,15 +40,11 @@ public class PeerNode {
         dirManager = new DirectoryManager();
         dirManager.createDefaultDirectory();
         clock = 0;
-        broadcastListener = new BroadcastListener();
-        electionBroadcast = new ElectionBroadcast();
     }
     
-    /**
-     * Sets this PeerNode as Leader
-     */
-    private void setAsLeader() {
-        leader = this;
+    private void callElection() {
+        electionBroadcast = new ElectionBroadcast();
+        electionBroadcast.start();
     }
     
     /**
@@ -60,14 +55,6 @@ public class PeerNode {
      */
     private boolean mergeSets(Set hsOne, Set hsTwo) {
         return hsOne.addAll(hsTwo);
-    }
-    
-    /**
-     * Sets the Leader
-     * @param node - The Leader PeerNode
-     */
-    private void setLeader(PeerNode node) {
-        leader = node;
     }
     
     /**
@@ -87,5 +74,12 @@ public class PeerNode {
     public static void main(String[] args) throws UnknownHostException, RemoteException {
         PeerNode node = new PeerNode();
         System.out.println("IP address = " + node.ipAddress.toString());
+        
+        node.broadcastListener = new BroadcastListener();
+        node.broadcastListener.start();
+        System.out.println("BroadcastListener run in main.");
+        
+        node.callElection();
+        
     }
 }

@@ -14,34 +14,31 @@ import java.net.InetAddress;
  *
  * @author markburton
  */
-public class ElectionBroadcast {
+public class ElectionBroadcast extends Thread {
 
-    
-    public ElectionBroadcast() {
-    }
-    
-    public void proposeLeader() {
+    @Override
+    public void run() {
+        System.out.println("Leader Address propsed.");
         DatagramSocket socket = null;
         DatagramPacket outPacket = null;
         byte[] outBuf;
         final int PORT = 8888;
+
         try {
             socket = new DatagramSocket();
             long counter = 0;
             String msg;
 
-            while (true) {
-                msg = "This is multicast! " + counter;
+            while (counter < 10) {
+                msg = "Candidate: " + InetAddress.getLocalHost();
                 counter++;
                 outBuf = msg.getBytes();
 
                 //Send to multicast IP address and port
                 InetAddress address = InetAddress.getByName("224.2.2.3");
                 outPacket = new DatagramPacket(outBuf, outBuf.length, address, PORT);
-
                 socket.send(outPacket);
-
-                System.out.println("Server sends : " + msg);
+                System.out.println("Server sends : " + msg + " counter=" + counter);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ie) {
@@ -51,5 +48,4 @@ public class ElectionBroadcast {
             System.out.println(ioe);
         }
     }
-
 }
