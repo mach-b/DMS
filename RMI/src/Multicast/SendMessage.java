@@ -41,7 +41,7 @@ public class SendMessage extends Thread{
             long counter = 0;
             String msg;
             
-            while (true) {
+            while (counter < 1) {
                 //msg = "Candidate: " + InetAddress.getLocalHost();
                 counter++;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
