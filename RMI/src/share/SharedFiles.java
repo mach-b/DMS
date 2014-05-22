@@ -1,6 +1,8 @@
 package share;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -9,6 +11,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import rmi.SharedFilesRMI;
 
 /**
@@ -48,15 +52,17 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
      * ip address
      * 
      * @param ip of the machine that you want to get the interface from
+     * @param fileName the name of the remote file
      * @return the RMI interface for shared files
      * @throws RemoteException if the remote registry cannot be found
      * @throws NotBoundException if the remote registry doesn't have an interface 
      */
-    public static SharedFilesRMI getRemoteFiles(String ip) 
+    public static File getRemoteFile(String ip, String fileName) 
             throws RemoteException, NotBoundException {
         
         Registry reg =  LocateRegistry.getRegistry(ip, 1099);
-        return (SharedFilesRMI) reg.lookup("SharedFiles");
+        SharedFilesRMI remoteFiles = (SharedFilesRMI) reg.lookup("SharedFiles");
+        return remoteFiles.getFile(fileName);
     }  
     
     @Override
@@ -89,6 +95,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         while (filesIterator.hasNext()) {
             File file = (File)filesIterator.next();
             if (file.getName().equals(fileName)) {
+                
                 return file;
             }
         }

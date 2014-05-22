@@ -1,10 +1,19 @@
 package share;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import peerNode.LeaderElector;
 
 /**
  * The UI for sharing files between two or more applications over a local network
@@ -12,10 +21,12 @@ import javax.swing.table.DefaultTableModel;
  * @author Kerry Powell
  * @version 1.0
  */
-public class ShareUI extends javax.swing.JFrame {
+public class ShareUI extends javax.swing.JFrame implements ActionListener {
     
     final private JFileChooser fc = new JFileChooser();
     final private SharedFiles sharedFiles;
+    final private Timer timer = new Timer(10000, this);
+    private LeaderElector leader;
 
     /**
      * Creates new form ShareUI
@@ -81,6 +92,11 @@ public class ShareUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(fileListLocal);
 
         btnSaveFile.setText("Download File");
+        btnSaveFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveFileActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("  Local Files");
 
@@ -150,6 +166,12 @@ public class ShareUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * When the 'Upload File' button is clicked the user is presented with a file
+     * chooser dialog to select a file to upload to add to the shared files
+     * 
+     * @param evt the event that triggered the method
+     */
     private void btnLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadFileActionPerformed
         
         int returnVal = fc.showOpenDialog(this);
@@ -168,6 +190,84 @@ public class ShareUI extends javax.swing.JFrame {
         } 
     }//GEN-LAST:event_btnLoadFileActionPerformed
 
+    /**
+     * When the 'Download File' button is clicked the app will then download the
+     * file to the RMIFileExchangeFolder
+     * 
+     * @param evt 
+     */
+    private void btnSaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveFileActionPerformed
+        
+        String[] selection = getCurrentRemoteSelection();
+        if (selection != null) {
+            
+            String ip = selection[0];
+            String fileName = selection[1];
+            try {
+                
+                File file = SharedFiles.getRemoteFile(ip, fileName);
+                saveFile(file);
+            } catch (RemoteException ex) {
+                
+                downloadWarning("Failed to connect to remote host:\n\n" + ex.getMessage());
+            } catch (NotBoundException ex) {
+                
+                downloadWarning("Failed to get remote files:\n\n" + ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnSaveFileActionPerformed
+
+    /**
+     * Display a warning dialog box to the user
+     * 
+     * @param message the message to be displayed
+     */
+    private void downloadWarning(String message) {
+        JOptionPane.showMessageDialog(this,
+                message,
+                "Download warning",
+                JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
+     * Get the current selection form the remote selection list
+     * 
+     * @return string array where result[0] = ip and result[1] = file name
+     */
+    private synchronized String[] getCurrentRemoteSelection() {
+        
+        String[] selection = null;
+        int rowIndex = tblRemoteFiles.getSelectedRow();
+        if (rowIndex != -1) {
+            
+            TableModel model = tblRemoteFiles.getModel();
+            if (model.getRowCount() < rowIndex) {
+                
+                selection = new String[2];
+                selection[0] = (String)model.getValueAt(rowIndex, 0);
+                selection[1] = (String)model.getValueAt(rowIndex, 1);
+            } else {
+                
+                downloadWarning("Selected file no longer available");
+            }
+            
+        } else {
+            downloadWarning("No file has been seleced to download");
+        }
+        return selection;
+    }
+    
+    /**
+     * Save a file to RMIFileExchangeFolder, check if file was not void and alerts
+     * user if file already exists
+     * 
+     * @param file to be saved
+     */
+    private void saveFile(File file) {
+        
+        
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -220,4 +320,23 @@ public class ShareUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable tblRemoteFiles;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public synchronized void actionPerformed(ActionEvent e) {
+        //Timer task performed
+        /*
+        if (leader.isAvailable()) {
+            //If the leader is not null
+            
+            //Get the files from the leader
+            //Update remote list
+            //If leader throws error, set leader to null
+            
+        //} else {
+            //If the leader is currently null
+            
+            //leader.startElection
+        }
+        */
+    }
 }
