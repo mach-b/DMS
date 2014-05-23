@@ -1,21 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package peerNode;
 
 import Message.Message;
 import Message.MessageType;
 import Multicast.BroadcastListener;
-import Multicast.DirectConnectionListener;
 import Multicast.ElectionBroadcast;
 import Multicast.SendMessage;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a peer node
@@ -29,19 +24,16 @@ public class PeerNode extends BroadcastListener {
     private InetAddress ipAddress, leaderAddress;
     private String inetAddressString;
     private int clock;
-    private BroadcastListener broadcastListener;
-    private ElectionBroadcast electionBroadcast;
-    private DirectoryManager dirManager;
+    private final ElectionBroadcast electionBroadcast;
     private boolean electingLeader;
     private Object leaderIp;
 
     public PeerNode() throws UnknownHostException, RemoteException {
         ipAddress = getIPAddress();
         setInetAddressString();
-        dirManager = new DirectoryManager();
-        dirManager.createDefaultDirectory();
         clock = 0;
         System.out.println("IP address :: "+inetAddressString);
+        electionBroadcast = new ElectionBroadcast(new Leader());
     }
 
     @Override
@@ -49,15 +41,15 @@ public class PeerNode extends BroadcastListener {
         System.out.println("Message Object Properties: " +
                 message.getMessageType().toString()+ " " + 
                 message.getSenderIPAddress());
+        try {
         if (message.getMessageType() == MessageType.ELECTION) {
             startElection();
-            
         }
         if (message.getMessageType() == MessageType.ELECT) {
             electionBroadcast.addElection(message);
         }
         if (message.getMessageType() == MessageType.DECLARE_LEADER) {
-            electionBroadcast.declearLeader();
+            electionBroadcast.leaderChosen(message);
         }
         if (message.getMessageType() == MessageType.PEER_LOST) {
             
@@ -65,10 +57,13 @@ public class PeerNode extends BroadcastListener {
         if (message.getMessageType() == MessageType.FIND_LEADER) {
             
         }
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //ELECTION("Election message"), ELECT("Elect"), DECLARE_LEADER("Declare leader message"), PEER_LOST("Peer host has been dropped"), FIND_LEADER("Find the leader on the network");
     }
     
-    public synchronized void startElection() {
+    public synchronized void startElection() throws UnknownHostException {
         
         electingLeader = true;
         leaderIp = null;
@@ -127,9 +122,10 @@ public class PeerNode extends BroadcastListener {
         System.out.println("BroadcastListener run in main.");
 
         //node.callElection();
-        Message m = new Message(MessageType.SELF_DISCOVERY, "192.168.1.2", "192.168.1.2", 1, "");
+        Message m = new Message(MessageType.DECLARE_LEADER, "192.168.1.2", "192.168.1.2", 1, "");
         SendMessage sendMessage = new SendMessage(m);
         sendMessage.start();
     }
+}
 
 

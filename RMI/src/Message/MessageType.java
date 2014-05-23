@@ -8,13 +8,15 @@ package Message;
 
 /**
  *
- * @author markburton
+ * @author Mark Burton and Kerry Powell
  */
 public enum MessageType {
     
-    ELECTION("Election message"), FIND_PEERS("Find Peers message"), 
-    PEER_TO_PEER("Peer to peer message"), DECLARE_LEADER("Declare leader message"),
-    SELF_DISCOVERY("Self discovery"), FILE_REQUEST("File request");
+    ELECTION("Election message"), 
+    ELECT("Elect"), 
+    DECLARE_LEADER("Declare leader message"),
+    PEER_LOST("Peer host has been dropped"),
+    FIND_LEADER("Find the leader on the network");
     
     private final String name;
     
