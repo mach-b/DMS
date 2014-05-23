@@ -82,15 +82,6 @@ public class PeerNode {
      * @throws UnknownHostException
      */
     private InetAddress getIPAddress() throws UnknownHostException {
-        String s = ""+InetAddress.getLocalHost();
-        String toReturn = "";
-        for(int i = 0; i < s.length(); i++) {
-            if(s.charAt(i) == '/') {
-                toReturn = "/";
-            }else {
-                toReturn += s.charAt(i);
-            }
-        }
         return InetAddress.getLocalHost();
     }
 
