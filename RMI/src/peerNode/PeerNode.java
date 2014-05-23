@@ -8,6 +8,7 @@ package peerNode;
 import Message.Message;
 import Message.MessageType;
 import Multicast.BroadcastListener;
+import Multicast.DirectConnectionListener;
 import Multicast.ElectionBroadcast;
 import Multicast.SendMessage;
 import java.net.InetAddress;
@@ -29,6 +30,7 @@ public class PeerNode {
     private Set<InetAddress> peerAddressList;  // if Leader, populate, else null??
     private int clock;
     private BroadcastListener broadcastListener;
+    private DirectConnectionListener directConnectionListener;
     private ElectionBroadcast electionBroadcast;
     private DirectoryManager dirManager;
 
@@ -97,6 +99,14 @@ public class PeerNode {
                 System.out.println("Message Recieved:" + message);
             }
         };
+        node.directConnectionListener = new DirectConnectionListener() {
+            
+            @Override
+            public void broadcastRecieved(String message) {
+                System.out.println("Message Recieved:" + message);
+            }
+        };
+        
         //node.broadcastListener.start();
         System.out.println("BroadcastListener run in main.");
 
