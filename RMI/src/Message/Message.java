@@ -6,6 +6,9 @@
 
 package Message;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  *
  * @author markburton
@@ -15,6 +18,7 @@ public class Message {
     private final double timeStamp;
     private final String senderIPAddress, recipientIPAddress, messageContent;
     private final MessageType messageType;
+    private static long timestamp = 0;
     
     /**
      * A Message
@@ -24,12 +28,24 @@ public class Message {
      * @param timestamp double The timestamp
      * @param messageContent String Any content to include
      */
-    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, double timestamp, String messageContent) {
+    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, double timestamp, String messageContent) throws UnknownHostException {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = timestamp;
         this.messageContent = messageContent;  // perhaps a filename?
+    }
+    
+    public Message(MessageType messageType, String messageContent) throws UnknownHostException {
+        this.messageType = messageType;
+        this.senderIPAddress = InetAddress.getLocalHost().toString();
+        this.recipientIPAddress = "broadcast";
+        this.timeStamp = getTimeStamp();
+        this.messageContent = messageContent;  // perhaps a filename?
+    }
+    
+    private synchronized static long getNewTimeStamp() {
+        return ++timestamp;
     }
 
     public String getRecipientIPAddress() {
