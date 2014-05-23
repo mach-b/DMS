@@ -6,6 +6,8 @@
 
 package peerNode;
 
+import Message.Message;
+import Message.MessageType;
 import Multicast.BroadcastListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -114,9 +116,11 @@ public class Leader extends BroadcastListener implements LeaderRMI{
     }
 
     @Override
-    public synchronized void broadcastRecieved(String message) {
-        System.out.println("Broadcast Recieved:" + message);
-        if (message.equals("Election Proposed")) {
+    public synchronized void broadcastRecieved(Message message) {
+        System.out.println("Message Object Properties: " +
+                message.getMessageType().toString()+ " " + 
+                message.getSenderIPAddress());
+        if (message.getMessageType() == MessageType.ELECTION) {
             startElection();
         }
     }
