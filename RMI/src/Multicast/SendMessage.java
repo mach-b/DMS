@@ -35,7 +35,7 @@ public class SendMessage extends Thread{
         DatagramSocket socket = null;
         DatagramPacket outPacket = null;
         byte[] outBuf;
-        final int PORT = 8888;
+        final int PORT = 8889;
 
         try {
             socket = new DatagramSocket();

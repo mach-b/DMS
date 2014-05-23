@@ -12,15 +12,16 @@ import java.io.Serializable;
  *
  * @author markburton
  */
-public class Message implements Serializable {
+public class Message {
     
-    private double timeStamp;
-    private String senderIPAddress, recipientIPAddress;
-    private MessageType messageType;
+    private final double timeStamp;
+    private final String senderIPAddress, recipientIPAddress;
+    private final MessageType messageType;
     
     public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, double timestamp) {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
+        this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = timestamp;
     }
 
