@@ -109,8 +109,10 @@ public class PeerNode {
         node.broadcastListener = new BroadcastListener() {
 
             @Override
-            public void broadcastRecieved(String message) {
-                System.out.println("Message Recieved:" + message);
+            public void broadcastRecieved(Message message) {
+                System.out.println("Message Object Properties: " +
+                        message.getMessageType().toString()+ " " +
+                        message.getSenderIPAddress());
             }
         };
         node.directConnectionListener = new DirectConnectionListener() {

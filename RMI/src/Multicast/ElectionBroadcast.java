@@ -5,10 +5,12 @@
  */
 package Multicast;
 
+import Message.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  *
@@ -16,7 +18,16 @@ import java.net.InetAddress;
  */
 public class ElectionBroadcast extends Thread {
     
+    private Message message = null;
+
+    public void beginElection() throws UnknownHostException {
+        message = new Message(MessageType.ELECTION, "");
+    }
     
+    @Override
+    public void start() {
+        
+    }
 
     @Override
     public void run() {
