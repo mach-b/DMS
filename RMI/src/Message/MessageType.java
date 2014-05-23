@@ -14,7 +14,7 @@ public enum MessageType {
     
     ELECTION("Election message"), FIND_PEERS("Find Peers message"), 
     PEER_TO_PEER("Peer to peer message"), DECLARE_LEADER("Declare leader message"),
-    SELF_DISCOVERY("Self discovery");
+    SELF_DISCOVERY("Self discovery"), FILE_REQUEST("File request");
     
     private final String name;
     

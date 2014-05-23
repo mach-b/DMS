@@ -8,7 +8,6 @@ package Multicast;
 
 import Message.Message;
 import com.google.gson.Gson;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
@@ -16,7 +15,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 /**
- *
+ * Sends a message to the recipient specified in the Message object.
  * @author markburton
  */
 public class SendMessage extends Thread{
@@ -43,14 +42,12 @@ public class SendMessage extends Thread{
             String msg;
 
             while (counter < 10) {
-                //msg = "Candidate: " + InetAddress.getLocalHost();
                 msg = gson.toJson(message);
                 System.out.println("JSON: "+msg);
                 counter++;
                 outBuf = msg.getBytes();
-
                 //Send to multicast IP address and port
-                InetAddress address = InetAddress.getByName("224.2.2.3");
+                InetAddress address = InetAddress.getByName(message.getRecipientIPAddress());
                 outPacket = new DatagramPacket(outBuf, outBuf.length, address, PORT);
                 socket.send(outPacket);
                 System.out.println("Server sends : " + msg + " counter=" + counter);

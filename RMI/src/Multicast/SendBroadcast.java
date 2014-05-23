@@ -15,7 +15,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 /**
- *
+ * Sends DatagramPacket containing JSON representation of a Message
+ * to Multicast group address 224.2.2.3 port 8888.
  * @author markburton
  */
 public class SendBroadcast extends Thread{
@@ -46,7 +47,6 @@ public class SendBroadcast extends Thread{
                 System.out.println("JSON: "+msg);
                 counter++;
                 outBuf = msg.getBytes();
-
                 //Send to multicast IP address and port
                 InetAddress address = InetAddress.getByName("224.2.2.3");
                 outPacket = new DatagramPacket(outBuf, outBuf.length, address, PORT);

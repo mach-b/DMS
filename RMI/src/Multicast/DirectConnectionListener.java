@@ -14,7 +14,9 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 /**
- *
+ * DirectConnectionListener listens for DatagramPackets on a MulticastSocket,
+ * it listens on the group address 224.2.2.3 port 8889, but also listens for
+ * packets addressed to a single PeerNode IP Address.
  * @author markburton
  */
 public abstract class DirectConnectionListener extends Thread {

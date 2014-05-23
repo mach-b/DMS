@@ -17,7 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * BroadcastListener listens for DatagramPackets on a MulticastSocket,
+ * it listens on the group address 224.2.2.3 port 8888.
  * @author markburton
  */
 public abstract class BroadcastListener extends Thread {

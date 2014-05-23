@@ -111,7 +111,7 @@ public class PeerNode {
         System.out.println("BroadcastListener run in main.");
 
         //node.callElection();
-        Message m = new Message(MessageType.SELF_DISCOVERY, "192.168.1.2", "192.168.1.2", 1);
+        Message m = new Message(MessageType.SELF_DISCOVERY, "192.168.1.2", "192.168.1.2", 1, "");
         SendMessage sendMessage = new SendMessage(m);
         sendMessage.start();
     }
