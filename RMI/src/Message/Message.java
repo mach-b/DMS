@@ -29,7 +29,7 @@ public class Message {
         this.senderIPAddress = senderIPAddress;
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = timestamp;
-        this.messageContent = messageContent;
+        this.messageContent = messageContent;  // perhaps a filename?
     }
 
     public String getRecipientIPAddress() {

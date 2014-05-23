@@ -27,6 +27,7 @@ public class PeerNode {
     private boolean isLeader;
     private boolean electionRunning;
     private InetAddress ipAddress, leaderAddress;
+    private String inetAddressString;
     private Set<InetAddress> peerAddressList;  // if Leader, populate, else null??
     private int clock;
     private BroadcastListener broadcastListener;
@@ -39,11 +40,13 @@ public class PeerNode {
         //setAsLeader(); 
         ipAddress = getIPAddress();
         leaderAddress = getIPAddress();
+        setInetAddressString();
         peerAddressList = new HashSet<>();
         peerAddressList.add(ipAddress);
         dirManager = new DirectoryManager();
         dirManager.createDefaultDirectory();
         clock = 0;
+        System.out.println("IP address :: "+inetAddressString);
     }
 
     private String getIPAddressAsString() {
@@ -59,7 +62,6 @@ public class PeerNode {
         electionBroadcast = new ElectionBroadcast();
         electionBroadcast.start();
     }
-    
     
 
     /**
@@ -80,9 +82,30 @@ public class PeerNode {
      * @throws UnknownHostException
      */
     private InetAddress getIPAddress() throws UnknownHostException {
+        String s = ""+InetAddress.getLocalHost();
+        String toReturn = "";
+        for(int i = 0; i < s.length(); i++) {
+            if(s.charAt(i) == '/') {
+                toReturn = "/";
+            }else {
+                toReturn += s.charAt(i);
+            }
+        }
         return InetAddress.getLocalHost();
     }
 
+    private void setInetAddressString() throws UnknownHostException {
+        String temp = ""+InetAddress.getLocalHost();
+        inetAddressString = "";
+        for(int i = 0; i < temp.length(); i++) {
+            if(temp.charAt(i) == '/') {
+                inetAddressString = "/";
+            }else {
+                inetAddressString += temp.charAt(i);
+            }
+        }
+    }
+    
     /**
      *
      * @param args
