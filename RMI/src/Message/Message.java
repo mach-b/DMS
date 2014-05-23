@@ -17,19 +17,11 @@ public class Message implements Serializable {
     private double timeStamp;
     private String senderIPAddress, recipientIPAddress;
     private MessageType messageType;
-    private String additionalContent;
     
     public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, double timestamp) {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
         this.timeStamp = timestamp;
-    }
-
-    public Message(double timeStamp, String senderIPAddress, String recipientIPAddress, MessageType messageType, String additionalContent) {
-        this.timeStamp = timeStamp;
-        this.senderIPAddress = senderIPAddress;
-        this.messageType = messageType;
-        this.additionalContent = additionalContent;
     }
 
     public String getRecipientIPAddress() {
@@ -48,8 +40,4 @@ public class Message implements Serializable {
         return messageType;
     }
 
-    public String getAdditionalContent() {
-        return additionalContent;
-    }
-    
 }
