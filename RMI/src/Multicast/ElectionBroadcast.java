@@ -6,13 +6,8 @@
 package Multicast;
 
 import Message.*;
-import com.google.gson.Gson;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import javax.swing.Timer;
@@ -20,7 +15,7 @@ import peerNode.Leader;
 
 /**
  *
- * @author markburton
+ * @author Mark Burton and Kerry Powell
  */
 public class ElectionBroadcast implements ActionListener{
     
@@ -50,12 +45,12 @@ public class ElectionBroadcast implements ActionListener{
     
     public void beginElection() throws UnknownHostException {
         Message message = new Message(MessageType.ELECTION, "");
-        new Broadcast(message); //send message
+        Broadcast.sendBroadcast(message); //send message
     }
     
     public void voteSelf() throws UnknownHostException {
         Message message = new Message(MessageType.ELECT, "");
-        new Broadcast(message);
+        Broadcast.sendBroadcast(message);
         startTimer();
     }
     
@@ -78,43 +73,5 @@ public class ElectionBroadcast implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         chooseLeader();
-    }
-    
-    private class Broadcast extends Thread {
-        
-        private final Message message;
-        
-        private Broadcast(Message message) {
-            this.message = message;
-            this.start();
-        }
-        
-        @Override
-        public void run() {
-            System.out.println("Leader Address propsed.");
-            DatagramSocket socket = null;
-            DatagramPacket outPacket = null;
-            byte[] outBuf;
-            final int PORT = 8888;
-
-            try {
-                socket = new DatagramSocket();
-                outBuf = new Gson().toJson(message).getBytes();
-
-                //Send to multicast IP address and port
-                InetAddress address = InetAddress.getByName("224.2.2.3");
-                outPacket = new DatagramPacket(outBuf, outBuf.length, address, PORT);
-                socket.send(outPacket);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ie) {}
-                
-            } catch (IOException ioe) {
-                System.out.println(ioe);
-            }
-        }
-        
-    }
-
-    
+    } 
 }
