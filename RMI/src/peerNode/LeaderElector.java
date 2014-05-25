@@ -17,6 +17,4 @@ public class LeaderElector {
     private InetAddress leader;
     
     
-    
-    
 }

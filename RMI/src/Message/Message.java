@@ -15,20 +15,20 @@ import java.net.UnknownHostException;
  */
 public class Message {
     
-    private final double timeStamp;
+    //private final double timeStamp;
     private final String senderIPAddress, recipientIPAddress, messageContent;
     private final MessageType messageType;
-    private static long timestamp = 0;
+    private static long timeStamp = 0;
     
     /**
      * A Message
      * @param messageType String The type of Message
      * @param senderIPAddress String The senders address
      * @param recipientIPAddress String The recipients address
-     * @param timestamp double The timestamp
+     * @param timestamp The timestamp
      * @param messageContent String Any content to include
      */
-    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, double timestamp, String messageContent) throws UnknownHostException {
+    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, long timestamp, String messageContent) throws UnknownHostException {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
         this.recipientIPAddress = recipientIPAddress;
@@ -38,21 +38,21 @@ public class Message {
     
     public Message(MessageType messageType, String messageContent) throws UnknownHostException {
         this.messageType = messageType;
-        this.senderIPAddress = InetAddress.getLocalHost().toString();
+        this.senderIPAddress = getIPString();
         this.recipientIPAddress = "broadcast";
         this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
     }
     
     private synchronized static long getNewTimeStamp() {
-        return ++timestamp;
+        return ++timeStamp;
     }
 
     public String getRecipientIPAddress() {
         return recipientIPAddress;
     }
 
-    public double getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
@@ -68,6 +68,10 @@ public class Message {
         return messageContent;
     }
     
-    
+    public String getIPString() throws UnknownHostException {
+        String s = InetAddress.getLocalHost().toString();
+        String[] segments = s.split("/");
+        return segments[segments.length-1];
+    }
 
 }

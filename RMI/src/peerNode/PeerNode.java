@@ -1,16 +1,14 @@
 package peerNode;
 
 import Message.Message;
-import Message.MessageType;
 import Multicast.BroadcastListener;
 import Multicast.ElectionBroadcast;
-import Multicast.SendMessage;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.util.Set;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import share.SharedFiles;
 
 /**
  * Represents a peer node that reacts to the broadcasts sent throughout the 
@@ -22,13 +20,16 @@ import java.util.logging.Logger;
 public class PeerNode extends BroadcastListener {
     
     private final Leader leader;
-
+    private final SharedFiles sharedFiles;
     private final ElectionBroadcast electionBroadcast;
+    private HashMap timeStampHM;
 
-    public PeerNode(Leader leader) throws UnknownHostException, RemoteException {
+    public PeerNode(Leader leader, SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
         this.leader = leader;
+        this.sharedFiles = sharedFiles;
         electionBroadcast = new ElectionBroadcast(new Leader());
         leader.findLeader();
+        timeStampHM = new HashMap();
     }
 
     @Override
@@ -36,8 +37,8 @@ public class PeerNode extends BroadcastListener {
         System.out.println("Message Object Properties: " +
                 message.getMessageType().toString()+ " " + 
                 message.getSenderIPAddress());
+        updateTimeStamps(message.getSenderIPAddress(), message.getTimeStamp());
         try {
-
             switch (message.getMessageType()) {
                 case ELECTION:
                     startElection();
@@ -46,13 +47,15 @@ public class PeerNode extends BroadcastListener {
                     electionBroadcast.addElection(message);
                     break;
                 case DECLARE_LEADER:
-                    electionBroadcast.leaderChosen(message);
+                    leader.setLeader(message.getMessageContent());
                     break;
                 case PEER_LOST:
                     //Tell leader to remove ip address from files
+                    sharedFiles.peerLost(message);
                     break;
                 case FIND_LEADER:
                     //Broadcast request for who is the leader
+                    leader.broadcastLeader();
                     break;
             }
             
@@ -72,26 +75,7 @@ public class PeerNode extends BroadcastListener {
         leader.electionStarted();
     }
     
-    /**
-     * Merge two InetAddress Sets
-     *
-     * @param listOne
-     * @param listTwo
-     * @return boolean success
-     */
-    private boolean mergeSets(Set hsOne, Set hsTwo) {
-        return hsOne.addAll(hsTwo);
-    }
-
-    /**
-     * Gets the IP address of this PeerNode
-     *
-     * @return InetAddress
-     * @throws UnknownHostException
-     */
-    private InetAddress getIPAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost();
-    }
+    
     
     /**
      *
@@ -101,12 +85,9 @@ public class PeerNode extends BroadcastListener {
      */
     public static void main(String[] args) throws UnknownHostException, RemoteException {
         
-        PeerNode node = new PeerNode(new Leader());
-        //node.broadcastListener.start();
-        System.out.println("BroadcastListener run in main.");
-        //node.callElection();
-        Message m = new Message(MessageType.DECLARE_LEADER, "192.168.1.2", "192.168.1.2", 1, "");
-        SendMessage sendMessage = new SendMessage(m);
-        sendMessage.start();
+    }
+
+    private void updateTimeStamps(String senderIPAddress, long timeStamp) {
+        timeStampHM.put(senderIPAddress, timeStamp);
     }
 }

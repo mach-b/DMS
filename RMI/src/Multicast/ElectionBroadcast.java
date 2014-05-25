@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 import peerNode.Leader;
 
@@ -59,19 +62,29 @@ public class ElectionBroadcast implements ActionListener{
         messages.add(message);
     }
     
-    public void leaderChosen(Message message) {
-        
-    }
-    
-    private void chooseLeader() {
+    private void chooseLeader() throws UnknownHostException {
         stopTimer();
         //find the leader in the messages
+        String leaderIP = "";
+        Iterator<Message> itr = messages.iterator();
+        while(itr.hasNext()) {
+            if(itr.next().getSenderIPAddress().compareTo(leaderIP)<1) {
+                leaderIP = itr.next().getSenderIPAddress();
+            }
+        }
         //broadcast messages
+        Message m = new Message(MessageType.DECLARE_LEADER, leaderIP);
+        Broadcast.sendBroadcast(m);
         messages = new HashSet<Message>();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        chooseLeader();
-    } 
+        try {
+            chooseLeader();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(ElectionBroadcast.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 }
