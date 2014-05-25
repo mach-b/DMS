@@ -1,17 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package Message;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author markburton
+ * @author Mark Burton, Kerry Powell
  */
 public class Message {
     
@@ -68,10 +64,14 @@ public class Message {
         return messageContent;
     }
     
-    public String getIPString() throws UnknownHostException {
-        String s = InetAddress.getLocalHost().toString();
-        String[] segments = s.split("/");
-        return segments[segments.length-1];
+    public static String getIPString() {
+        try {
+            String s = InetAddress.getLocalHost().toString();
+            String[] segments = s.split("/");
+            return segments[segments.length-1];
+        } catch (UnknownHostException ex) {
+            return "";
+        }
     }
 
 }
