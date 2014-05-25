@@ -23,13 +23,14 @@ public class PeerNode extends BroadcastListener {
     private final SharedFiles sharedFiles;
     private final ElectionBroadcast electionBroadcast;
     private HashMap timeStampHM;
+    private long timeStamp;
 
     public PeerNode(Leader leader, SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
-        this.leader = leader;
+        this.leader = new Leader();
         this.sharedFiles = sharedFiles;
         electionBroadcast = new ElectionBroadcast(new Leader());
-        leader.findLeader();
         timeStampHM = new HashMap();
+        timeStamp = 0;
     }
 
     @Override
@@ -37,6 +38,9 @@ public class PeerNode extends BroadcastListener {
         System.out.println("Message Object Properties: " +
                 message.getMessageType().toString()+ " " + 
                 message.getSenderIPAddress());
+        if(message.getTimeStamp()>timeStamp){
+            updateTimeStamps(message.getRecipientIPAddress(), timeStamp);
+        }
         updateTimeStamps(message.getSenderIPAddress(), message.getTimeStamp());
         try {
             switch (message.getMessageType()) {
@@ -47,7 +51,7 @@ public class PeerNode extends BroadcastListener {
                     electionBroadcast.addElection(message);
                     break;
                 case DECLARE_LEADER:
-                    leader.setLeader(message.getMessageContent());
+                    leader.setLeader(message);
                     break;
                 case PEER_LOST:
                     //Tell leader to remove ip address from files
@@ -57,6 +61,9 @@ public class PeerNode extends BroadcastListener {
                     //Broadcast request for who is the leader
                     leader.broadcastLeader();
                     break;
+                case GET_SNAPSHOT:
+                    //Message leader timeStamp
+                    
             }
             
         } catch (UnknownHostException ex) {
@@ -88,6 +95,10 @@ public class PeerNode extends BroadcastListener {
     }
 
     private void updateTimeStamps(String senderIPAddress, long timeStamp) {
-        timeStampHM.put(senderIPAddress, timeStamp);
+        if(timeStamp>-1) {
+            timeStampHM.put(senderIPAddress, timeStamp);
+        }
     }
+    
+    
 }

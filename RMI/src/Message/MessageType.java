@@ -10,5 +10,6 @@ public enum MessageType {
     ELECT, 
     DECLARE_LEADER,
     PEER_LOST,
-    FIND_LEADER;
+    FIND_LEADER,
+    GET_SNAPSHOT;
 }
