@@ -52,10 +52,10 @@ public class PeerNode extends BroadcastListener {
             electionBroadcast.leaderChosen(message);
         }
         if (message.getMessageType() == MessageType.PEER_LOST) {
-            
+            //Tell leader to remove ip address from files
         }
         if (message.getMessageType() == MessageType.FIND_LEADER) {
-            
+            //Broadcast request for who is the leader
         }
         } catch (UnknownHostException ex) {
             Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
