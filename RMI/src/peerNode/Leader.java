@@ -2,13 +2,9 @@ package peerNode;
 
 import Message.Message;
 import Message.MessageType;
-import Multicast.BroadcastListener;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import rmi.LeaderRMI;
+import Multicast.Broadcast;
+import Multicast.LeaderBroadcast;
+import java.net.UnknownHostException;
 
 /**
  * A class that handles finding the networks leader and electing the leader, is 
@@ -17,41 +13,62 @@ import rmi.LeaderRMI;
  * @author Kerry Powell
  * @version 1.0
  */
-public class Leader extends BroadcastListener implements LeaderRMI{
+public class Leader {
     
     private String leaderIp = null;
+    private boolean isLeader = false;
     private boolean electingLeader = false;
-    private ArrayList<FileNameEntry> fileRegestry = new ArrayList<>();
     
     public Leader() {
-        
-        registerLeaderRMI(); //Register this RMI
-        
-         //See who is leader
-        
-         //If no leader is found, start election
-        
-    }
-    
-    /**
-     * Begin electing a new leader
-     */
-    public synchronized void startElection() {
-        
-        electingLeader = true;
-        leaderIp = null;
-        
+        // See who is leader
+        LeaderBroadcast.findLeader(this);
     }
     
     /**
      * Set who the current leader is
      * 
-     * @param ip of the leader or null if self is leader
+     * @param message of the leader or null if self is leader
      */
-    public synchronized void setLeader(String ip) {
+    public synchronized void setLeader(Message message) {
         
-        leaderIp = ip;
+        leaderIp = message.getMessageContent();
+        isLeader = leaderIp.equals(Message.getIPString());
         electingLeader = false;
+    }
+    
+    /**
+     * Set the leader to be in leader election state
+     */
+    public synchronized void electionStarted() {
+        
+        leaderIp = null;
+        isLeader = false;
+        electingLeader = true;
+    }
+
+    /**
+     * Is there a leader that has been chosen?
+     * 
+     * @return true if there is a leader
+     */
+    public synchronized boolean hasLeader() {
+        
+        return leaderIp != null || !isLeader;
+    }
+    
+    /**
+     * Send out a broadcast message saying you are the leader
+     */
+    public void broadcastLeader() {
+        
+        if (hasLeader() && !electingLeader && isLeader) {
+            try {
+                Message message = new Message(MessageType.DECLARE_LEADER, Message.getIPString());
+                Broadcast.sendBroadcast(message);
+            } catch (UnknownHostException ex) {
+                System.out.println(ex);
+            }
+        }
     }
     
     /**
@@ -59,100 +76,9 @@ public class Leader extends BroadcastListener implements LeaderRMI{
      * there is an election then this returns null
      * 
      * @return The current leader or null if currently electing
-     * @throws RemoteException when no connection can be made to the remote process
-     * @throws NotBoundException when the remote process has not been bound
      */
-    public LeaderRMI getLeader() throws RemoteException, NotBoundException {
+    public String getLeaderIp() {
         
-        if (electingLeader) {
-            return null;
-        }
-        
-        if (leaderIp == null) {
-            
-            return this;
-        } else {
-            
-            Registry reg =  LocateRegistry.getRegistry(leaderIp, 1099);
-            LeaderRMI remoteFiles = (LeaderRMI)reg.lookup("Leader");
-            return remoteFiles;
-        }
+        return leaderIp;
     }
-    
-    /**
-     * Register the object as an RMI
-     */
-    private void registerLeaderRMI() {
-        
-        Registry reg;
-        try {
-            reg = LocateRegistry.createRegistry(1099);
-            reg.bind("Leader", this);
-        } catch (Exception ex) {
-            System.err.println(ex);
-        } 
-    }
-
-    @Override
-    public synchronized ArrayList<String[][]> getAllFileNames(String ip) throws RemoteException {
-        ArrayList<String[][]> fileNames = new ArrayList<>();
-        for (FileNameEntry entry: fileRegestry) {
-            if (!entry.ip.equals(ip)) {
-                fileNames.add(entry.array);
-            }
-        }
-        return fileNames;
-    }
-
-    @Override
-    public synchronized void updateFileNames(String ip, String[] fileNames) throws RemoteException {
-        fileRegestry.add(new FileNameEntry(ip, fileNames));
-    }
-
-    @Override
-    public synchronized void broadcastRecieved(Message message) {
-        System.out.println("Message Object Properties: " +
-                message.getMessageType().toString()+ " " + 
-                message.getSenderIPAddress());
-        if (message.getMessageType() == MessageType.ELECTION) {
-            startElection();
-        }
-    }
-
-    void findLeader() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    void electionStarted() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    /**
-     * Hold the file names and ip addresses in a convenient class to be passed 
-     * to other processes
-     * 
-     * @author Kerry Powell
-     * @version 1.0
-     */
-    private class FileNameEntry {
-        
-        private String ip;
-        private String[][] array;
-        
-        /**
-         * Create an entry, this will populate the array ready for retrieval
-         * 
-         * @param ip of the remote process
-         * @param fileNames list of file names available
-         */
-        private FileNameEntry(String ip, String[] fileNames) {
-            this.ip = ip;
-            array = new String[fileNames.length][2];
-            for (int i = 0; i < fileNames.length; i++) {
-                array[i][0] = ip;
-                array[i][1] = fileNames[i];
-            }
-        }
-    }
-    
 }

@@ -1,18 +1,16 @@
 package share;
 
+import Message.Message;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rmi.SharedFilesRMI;
 
 /**
@@ -23,7 +21,8 @@ import rmi.SharedFilesRMI;
  */
 public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
 
-    Set<File> files;
+    private Set<File> files;
+    private ArrayList<RemoteFiles> remoteFiles = new ArrayList<>();
     
     public SharedFiles() throws RemoteException {
         
@@ -65,7 +64,22 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         return remoteFiles.getFile(fileName);
     }  
     
-    @Override
+    /**
+     * When a peer is lost to the 
+     * 
+     * @param message 
+     */
+    public void peerLost(Message message) {
+        
+        String ip = message.getMessageContent();
+        for (int i = 0; i < remoteFiles.size(); i++) {
+            
+            String remoteIp = remoteFiles.get(i).getIp();
+            if (remoteIp.equals(ip))
+                remoteFiles.remove(i);
+        }
+    }
+    
     public String[] getFileNames() {
         
         String[] names = new String[files.size()];
@@ -100,5 +114,23 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
             }
         }
         return null;
+    }
+    
+    @Override
+    public synchronized ArrayList<String[][]> getAllFileNames(String ip) throws RemoteException {
+        
+        ArrayList<String[][]> fileNames = new ArrayList<>();
+        for (RemoteFiles entry: remoteFiles) {
+            if (!entry.getIp().equals(ip)) {
+                fileNames.add(entry.getArray());
+            }
+        }
+        return fileNames;
+    }
+
+    @Override
+    public synchronized void updateFileNames(String ip, String[] fileNames) throws RemoteException {
+        
+        remoteFiles.add(new RemoteFiles(ip, fileNames));
     }
 }
