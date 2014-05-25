@@ -118,6 +118,14 @@ public class Leader extends BroadcastListener implements LeaderRMI{
             startElection();
         }
     }
+
+    void findLeader() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    void electionStarted() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     /**
      * Hold the file names and ip addresses in a convenient class to be passed 

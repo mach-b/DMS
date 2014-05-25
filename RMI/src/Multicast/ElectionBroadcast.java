@@ -30,7 +30,7 @@ public class ElectionBroadcast implements ActionListener{
     
     private synchronized void startTimer() {
         if (timer == null) {
-            timer = new Timer(300000, this);
+            timer = new Timer(10000, this);
             timer.start();
         }
     }

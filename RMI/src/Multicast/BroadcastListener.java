@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Multicast;
 
 import Message.Message;
@@ -15,11 +10,16 @@ import java.net.MulticastSocket;
 /**
  * BroadcastListener listens for DatagramPackets on a MulticastSocket,
  * it listens on the group address 224.2.2.3 port 8888.
- * @author markburton
+ * 
+ * @author Mark Burton, Kerry Powell
+ * @version 1.0
  */
 public abstract class BroadcastListener extends Thread {
     
     private Gson gson = new Gson();
+    private final int PORT = 8888;
+    private final String BROADCAST_HOST = "224.2.2.3";
+    private final int BUFFER_SIZE = 1024;
     
     protected BroadcastListener(){
         
@@ -28,25 +28,24 @@ public abstract class BroadcastListener extends Thread {
 
     @Override
     public void run() {
-        MulticastSocket socket = null;
-        DatagramPacket inPacket = null;
-        byte[] inBuf = new byte[1024];
+
         while (true) {
             try {
                 //Prepare to join multicast group
-                socket = new MulticastSocket(8888);
-                InetAddress address = InetAddress.getByName("224.2.2.3");
+                MulticastSocket socket = new MulticastSocket(PORT);
+                InetAddress address = InetAddress.getByName(BROADCAST_HOST);
                 socket.joinGroup(address);
+                byte[] inBuf = new byte[BUFFER_SIZE];
 
                 while (true) {
-                    inPacket = new DatagramPacket(inBuf, inBuf.length);
+                    DatagramPacket inPacket = new DatagramPacket(inBuf, inBuf.length);
                     socket.receive(inPacket);
                     String packetString = new String(inBuf, 0, inPacket.getLength());
                     Message message = gson.fromJson(packetString, Message.class);
                     broadcastRecieved(message);
                 }
-            } catch (IOException ioe) {
-                System.out.println(ioe);
+            } catch (IOException e) {
+                System.out.println(e);
             }
             try {
                 Thread.sleep(500);

@@ -10,13 +10,14 @@ import java.net.InetAddress;
 /**
 * Class for sending a broadcast message on a new thread
 * 
-* @author Kerry Powell
+* @author Kerry Powell, Mark Burton
 * @version 1.0
 */
 public class Broadcast extends Thread {
 
     private final Message message;
-    final int PORT = 8888;
+    private final int PORT = 8888;
+    private final String BROADCAST_HOST = "224.2.2.3";
 
     /**
      * Build a broadcast
@@ -42,7 +43,7 @@ public class Broadcast extends Thread {
     public void run() {
         try {
             // Send to multicast IP address and port
-            InetAddress address = InetAddress.getByName("224.2.2.3");
+            InetAddress address = InetAddress.getByName(BROADCAST_HOST);
             // Setup message to be sent
             DatagramSocket socket = new DatagramSocket();
             byte[] outBuf = new Gson().toJson(message).getBytes();

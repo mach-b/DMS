@@ -13,27 +13,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents a peer node
+ * Represents a peer node that reacts to the broadcasts sent throughout the 
+ * network
  *
- * @author markburton
+ * @author Mark Burton, Kerry Powell
+ * @version 1.0
  */
 public class PeerNode extends BroadcastListener {
+    
+    private final Leader leader;
 
-    private boolean isLeader;
-    private boolean electionRunning;
-    private InetAddress ipAddress, leaderAddress;
-    private String inetAddressString;
-    private int clock;
     private final ElectionBroadcast electionBroadcast;
-    private boolean electingLeader;
-    private Object leaderIp;
 
-    public PeerNode() throws UnknownHostException, RemoteException {
-        ipAddress = getIPAddress();
-        setInetAddressString();
-        clock = 0;
-        System.out.println("IP address :: "+inetAddressString);
+    public PeerNode(Leader leader) throws UnknownHostException, RemoteException {
+        this.leader = leader;
         electionBroadcast = new ElectionBroadcast(new Leader());
+        leader.findLeader();
     }
 
     @Override
@@ -42,40 +37,41 @@ public class PeerNode extends BroadcastListener {
                 message.getMessageType().toString()+ " " + 
                 message.getSenderIPAddress());
         try {
-        if (message.getMessageType() == MessageType.ELECTION) {
-            startElection();
-        }
-        if (message.getMessageType() == MessageType.ELECT) {
-            electionBroadcast.addElection(message);
-        }
-        if (message.getMessageType() == MessageType.DECLARE_LEADER) {
-            electionBroadcast.leaderChosen(message);
-        }
-        if (message.getMessageType() == MessageType.PEER_LOST) {
-            //Tell leader to remove ip address from files
-        }
-        if (message.getMessageType() == MessageType.FIND_LEADER) {
-            //Broadcast request for who is the leader
-        }
+
+            switch (message.getMessageType()) {
+                case ELECTION:
+                    startElection();
+                    break;
+                case ELECT:
+                    electionBroadcast.addElection(message);
+                    break;
+                case DECLARE_LEADER:
+                    electionBroadcast.leaderChosen(message);
+                    break;
+                case PEER_LOST:
+                    //Tell leader to remove ip address from files
+                    break;
+                case FIND_LEADER:
+                    //Broadcast request for who is the leader
+                    break;
+            }
+            
         } catch (UnknownHostException ex) {
             Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //ELECTION("Election message"), ELECT("Elect"), DECLARE_LEADER("Declare leader message"), PEER_LOST("Peer host has been dropped"), FIND_LEADER("Find the leader on the network");
     }
     
-    public synchronized void startElection() throws UnknownHostException {
+    /**
+     * Begin an election
+     * 
+     * @throws UnknownHostException 
+     */
+    private synchronized void startElection() throws UnknownHostException {
         
-        electingLeader = true;
-        leaderIp = null;
         electionBroadcast.voteSelf();
-    }
-
-    private void callElection() {
-//        electionBroadcast = new ElectionBroadcast();
-//        electionBroadcast.start();
+        leader.electionStarted();
     }
     
-
     /**
      * Merge two InetAddress Sets
      *
@@ -96,36 +92,21 @@ public class PeerNode extends BroadcastListener {
     private InetAddress getIPAddress() throws UnknownHostException {
         return InetAddress.getLocalHost();
     }
-
-    private void setInetAddressString() throws UnknownHostException {
-        String temp = ""+InetAddress.getLocalHost();
-        inetAddressString = "";
-        for(int i = 0; i < temp.length(); i++) {
-            if(temp.charAt(i) == '/') {
-                inetAddressString = "/";
-            }else {
-                inetAddressString += temp.charAt(i);
-            }
-        }
-    }
     
     /**
      *
      * @param args
      * @throws UnknownHostException
+     * @throws java.rmi.RemoteException
      */
     public static void main(String[] args) throws UnknownHostException, RemoteException {
-        PeerNode node = new PeerNode();
-        System.out.println("IP address = " + node.ipAddress.toString());
         
+        PeerNode node = new PeerNode(new Leader());
         //node.broadcastListener.start();
         System.out.println("BroadcastListener run in main.");
-
         //node.callElection();
         Message m = new Message(MessageType.DECLARE_LEADER, "192.168.1.2", "192.168.1.2", 1, "");
         SendMessage sendMessage = new SendMessage(m);
         sendMessage.start();
     }
 }
-
-
