@@ -7,14 +7,10 @@ package Multicast;
 
 import Message.Message;
 import com.google.gson.Gson;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * BroadcastListener listens for DatagramPackets on a MulticastSocket,
