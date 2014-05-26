@@ -24,11 +24,11 @@ public class Message {
      * @param timestamp The timestamp
      * @param messageContent String Any content to include
      */
-    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, long timestamp, String messageContent)  {
+    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, String messageContent)  {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
         this.recipientIPAddress = recipientIPAddress;
-        this.timeStamp = timestamp;
+        this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
     }
     
@@ -47,11 +47,12 @@ public class Message {
      * @param timeStamp  
      * @param messageContent 
      */
-    public Message(MessageType messageType, String recipientIPAddress, long timeStamp) {
+    public Message(MessageType messageType, String recipientIPAddress, String messageContent) {
         this.messageType = messageType;
         this.senderIPAddress = getIPString();
         this.recipientIPAddress = recipientIPAddress;
-        this.timeStamp = timeStamp;
+        this.timeStamp = getTimeStamp();
+        this.messageContent = messageContent;
     }
     
     private synchronized static long getNewTimeStamp() {

@@ -14,14 +14,14 @@ import java.util.logging.Logger;
 import share.SharedFiles;
 
 /**
- * Represents a peer node that reacts to the broadcasts sent throughout the 
+ * Represents a peer node that reacts to the broadcasts sent throughout the
  * network
  *
  * @author Mark Burton, Kerry Powell
  * @version 1.0
  */
 public class PeerNode extends BroadcastListener {
-    
+
     private final Leader leader;
     private final SharedFiles sharedFiles;
     private final ElectionBroadcast electionBroadcast;
@@ -38,12 +38,9 @@ public class PeerNode extends BroadcastListener {
 
     @Override
     public synchronized void broadcastRecieved(Message message) {
-        System.out.println("Message Object Properties: " +
-                message.getMessageType().toString()+ " " + 
-                message.getSenderIPAddress());
-//        if(message.getTimeStamp()>timeStamp){
-//            updateTimeStamps(message.getSenderIPAddress(), timeStamp);
-//        }
+        System.out.println("Message Object Properties: "
+                + message.getMessageType().toString() + " "
+                + message.getSenderIPAddress());
         updateTimeStamps(message.getSenderIPAddress(), message.getTimeStamp());
         try {
             switch (message.getMessageType()) {
@@ -66,30 +63,30 @@ public class PeerNode extends BroadcastListener {
                     break;
                 case REQUEST_SNAPSHOT:  // Request snapshot to include requester's IP in message content.
                     //DirectMessage sender
-                    Message m = new Message(MessageType.SUPPLY_TIMESTAMP, 
-//                            message.getMessageContent(), timeStamp);
-//                    DirectMessage.sendDirectMessage(m, m.getRecipientIPAddress());
-//                    break;
+                    Message m = new Message(MessageType.SUPPLY_TIMESTAMP,
+                            message.getSenderIPAddress(), "Supplying Timestamp");
+                    DirectMessage.sendDirectMessage(m, m.getRecipientIPAddress());
+                    break;
                 case SUPPLY_TIMESTAMP:
-                    
+                    break;
             }
-            
+
         } catch (UnknownHostException ex) {
             Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /**
      * Begin an election
-     * 
-     * @throws UnknownHostException 
+     *
+     * @throws UnknownHostException
      */
     private synchronized void startElection() throws UnknownHostException {
-        
+
         electionBroadcast.voteSelf();
         leader.electionStarted();
     }
-    
+
     /**
      *
      * @param args
@@ -97,24 +94,24 @@ public class PeerNode extends BroadcastListener {
      * @throws java.rmi.RemoteException
      */
     public static void main(String[] args) throws UnknownHostException, RemoteException {
-        
+
         System.out.println("Address = " + InetAddress.getLocalHost());
     }
 
     private void updateTimeStamps(String senderIPAddress, long timeStamp) {
-        if(timeStamp>-1) {
+        if (timeStamp > -1) {
             timeStampHM.put(senderIPAddress, timeStamp);
         }
     }
-    
+
     public static String getPeerIPString() {
         try {
             String s = InetAddress.getLocalHost().toString();
             String[] segments = s.split("/");
-            return segments[segments.length-1];
+            return segments[segments.length - 1];
         } catch (UnknownHostException ex) {
             return "";
         }
     }
-    
+
 }
