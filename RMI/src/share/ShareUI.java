@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import peerNode.Leader;
 import peerNode.LeaderElector;
 
 /**
@@ -26,7 +27,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
     final private JFileChooser fc = new JFileChooser();
     final private SharedFiles sharedFiles;
     final private Timer timer = new Timer(10000, this);
-    private LeaderElector leader;
+    final private Leader leader;
 
     /**
      * Creates new form ShareUI
@@ -35,6 +36,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         
         initComponents();
         sharedFiles = new SharedFiles();
+        leader = new PeerNode.getLeader();
     }
     
     /**
@@ -300,7 +302,6 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
             
             public void run() {
                 try {
-                    
                     new ShareUI().setVisible(true);
                 } catch (RemoteException ex) {
                     
@@ -323,20 +324,10 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
 
     @Override
     public synchronized void actionPerformed(ActionEvent e) {
-        //Timer task performed
-        /*
-        if (leader.isAvailable()) {
-            //If the leader is not null
-            
-            //Get the files from the leader
-            //Update remote list
-            //If leader throws error, set leader to null
-            
-        //} else {
-            //If the leader is currently null
-            
-            //leader.startElection
+        
+        String[][] remoteList = sharedFiles.getAllRemoteFiles(null);
+        if (remoteList != null) {
+            updateFileListRemote(remoteList);
         }
-        */
     }
 }

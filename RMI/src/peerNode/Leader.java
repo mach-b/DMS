@@ -25,6 +25,15 @@ public class Leader {
     }
     
     /**
+     * Check to see if this instance of the leader class is the current leader
+     * 
+     * @return true if this class is the current leader
+     */
+    public boolean isLeader() {
+        return isLeader;
+    }
+    
+    /**
      * Set who the current leader is
      * 
      * @param message of the leader or null if self is leader
