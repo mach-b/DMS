@@ -182,13 +182,13 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
     */
     private SharedFilesRMI getSharedFilesRMI(Leader leader) {
         
-        if (leader.isLeader()) {
+        /*if (leader.isLeader()) {
             System.out.println("Im the leader");
             return this;
-        } else if(leader.getLeaderIp() != null){
+        } else*/ if(leader.hasLeader()){
             try {
                 Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), 1099);
-                return (SharedFilesRMI) reg.lookup(CLASS_NAME+leader.getLeaderId());
+                return (SharedFilesRMI) reg.lookup(CLASS_NAME + leader.getLeaderId());
             }catch (Exception e){
                 System.out.println("Failed to connect to Leader RMI:\n" + e);
                 Message message = new Message(MessageType.ELECTION, 
