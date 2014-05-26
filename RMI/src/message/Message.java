@@ -4,9 +4,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * 
+ * A class that stores the data for messages to be sent over the network
  * 
  * @author Mark Burton, Kerry Powell
+ * @version 1.0
  */
 public class Message {
     

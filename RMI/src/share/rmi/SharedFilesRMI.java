@@ -1,4 +1,4 @@
-package rmi;
+package share.rmi;
 
 import java.io.File;
 import java.rmi.Remote;

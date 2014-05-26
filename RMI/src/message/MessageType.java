@@ -4,6 +4,7 @@ package message;
  * Message type enum for when sending messages
  * 
  * @author Mark Burton and Kerry Powell
+ * @version 1.0
  */
 public enum MessageType {
     

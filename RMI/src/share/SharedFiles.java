@@ -1,7 +1,5 @@
 package share;
 
-import message.Message;
-import message.MessageType;
 import java.io.File;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -12,9 +10,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import message.Message;
+import message.MessageType;
 import multicast.Broadcast;
 import peerNode.Leader;
-import rmi.SharedFilesRMI;
+import share.rmi.SharedFilesRMI;
 
 /**
  * Class that represents the files that can be shared from each application

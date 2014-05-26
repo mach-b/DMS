@@ -30,7 +30,7 @@ public class PeerNode extends BroadcastListener {
     public PeerNode(SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
         this.leader = new Leader();
         this.sharedFiles = sharedFiles;
-        electionBroadcast = new ElectionBroadcast(new Leader());
+        electionBroadcast = new ElectionBroadcast(leader);
         timeStampHM = new HashMap();
         ipAddress = Message.getIPString();
     }

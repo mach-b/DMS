@@ -9,8 +9,9 @@ import javax.swing.Timer;
 import peerNode.Leader;
 
 /**
- *
- * @author Mark Burton and Kerry Powell
+ * Handles the election process for electing a new leader
+ * 
+ * @author Mark Burton, Kerry Powell
  * @version 1.1
  */
 public class ElectionBroadcast extends Thread{

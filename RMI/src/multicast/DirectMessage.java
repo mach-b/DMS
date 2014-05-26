@@ -1,22 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package multicast;
 
 import message.Message;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 /**
  * Sends a message to the recipient specified in the Message object.
- * @author markburton
+ * 
+ * @author Mark Burton
+ * @version 1.0
  */
 public class DirectMessage extends Thread{
     
