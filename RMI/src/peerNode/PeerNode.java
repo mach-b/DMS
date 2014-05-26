@@ -24,13 +24,11 @@ public class PeerNode extends BroadcastListener {
 
     private final Leader LEADER;
     private final SharedFiles SHARED_FILES;
-    private final ElectionBroadcast ELECTION_BROADCASTER;
     private final HashMap TIME_STAMPS;
 
     public PeerNode(SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
         this.LEADER = new Leader();
         this.SHARED_FILES = sharedFiles;
-        ELECTION_BROADCASTER = new ElectionBroadcast(LEADER);
         TIME_STAMPS = new HashMap();
     }
 
@@ -69,7 +67,7 @@ public class PeerNode extends BroadcastListener {
                         startElection();
                         break;
                     case ELECT:
-                        ELECTION_BROADCASTER.addElection(message);
+                        ElectionBroadcast.addElection(message);
                         break;
                     case DECLARE_LEADER:
                         LEADER.setLeader(message);
@@ -106,8 +104,7 @@ public class PeerNode extends BroadcastListener {
      */
     private synchronized void startElection() throws UnknownHostException {
 
-        ELECTION_BROADCASTER.voteSelf();
-        LEADER.electionStarted();
+        ElectionBroadcast.voteSelf(LEADER);
     }
 
     /**
@@ -118,17 +115,14 @@ public class PeerNode extends BroadcastListener {
      */
     private boolean updateTimeStamps(Message message) {
         
-        long returnValue = 0;
-        try {
-            returnValue = (long)TIME_STAMPS.get(message.getSenderIPAddress());
-        } catch (Exception ex) {
-            System.out.println(TIME_STAMPS.get(message.getSenderIPAddress()) + "-" + ex);
-        }
+        Object value = TIME_STAMPS.get(message.getID());
+        long returnValue = value == null ? 0 : (long)value;
         if (returnValue < message.getTimeStamp()) {
-
-            TIME_STAMPS.put(message.getSenderIPAddress(), message.getTimeStamp());
+            //Add and process timestamp if it is current
+            TIME_STAMPS.put(message.getID(), message.getTimeStamp());
             return true;
         }
+        System.out.println("Time:" + returnValue + " ID:" +message.getID());
         return false;
     }
 }

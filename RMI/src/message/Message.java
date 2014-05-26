@@ -2,6 +2,7 @@ package message;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 /**
  * A class that stores the data for messages to be sent over the network
@@ -15,7 +16,9 @@ public class Message {
     private final String senderIPAddress, recipientIPAddress, messageContent;
     private final MessageType messageType;
     private final long timeStamp;
+    private String id;
     private static long timeStampCount = 0;
+    private static String masterId = null;
     
     /**
      * A Message
@@ -31,6 +34,7 @@ public class Message {
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = getNewTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
+        this.id = getMasterID();
         messageCreated();
     }
     
@@ -46,6 +50,7 @@ public class Message {
         this.recipientIPAddress = "broadcast";
         this.timeStamp = getNewTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
+        this.id = getMasterID();
         messageCreated();
     }
     
@@ -62,7 +67,20 @@ public class Message {
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = getNewTimeStamp();
         this.messageContent = messageContent;
+        this.id = getMasterID();
         messageCreated();
+    }
+    
+    public static String getMasterID() {
+        
+        if (masterId == null) {
+            masterId = getIPString() + ":" + new Random().nextInt();
+        }
+        return masterId;
+    }
+    
+    public String getID() {
+        return id;
     }
     
     private void messageCreated() {

@@ -261,7 +261,8 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         String snapshot = "System Snapshot\n";
         for (Map.Entry entry: timeStamps.entrySet()) {
             // Iterate through the map and add values to the result
-            snapshot += "\nIP:" + entry.getKey() + " Vector:" + entry.getValue();
+            String ip = entry.getKey().toString().split(":")[0];
+            snapshot += "\nIP:" + ip + " Vector:" + entry.getValue();
         }
         displayMessage("Snapshot", snapshot);
     }//GEN-LAST:event_mnuSnapshotActionPerformed

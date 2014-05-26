@@ -32,6 +32,10 @@ public class Leader {
         return isLeader;
     }
     
+    public boolean electingLeader() {
+        return electingLeader;
+    }
+    
     /**
      * Set who the current leader is
      * 
@@ -40,7 +44,7 @@ public class Leader {
     public synchronized void setLeader(Message message) {
         
         leaderIp = message.getMessageContent();
-        isLeader = leaderIp.equals(Message.getIPString());
+        isLeader = message.getID().equals(Message.getMasterID());
         electingLeader = false;
     }
     
@@ -69,7 +73,7 @@ public class Leader {
      */
     public void broadcastLeader() {
         
-        if (hasLeader() && !electingLeader && isLeader) {
+        if (isLeader) {
 
             Message message = new Message(MessageType.DECLARE_LEADER, Message.getIPString());
             Broadcast.sendBroadcast(message);

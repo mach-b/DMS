@@ -5,7 +5,6 @@ import message.Message;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
-import javax.swing.Timer;
 import peerNode.Leader;
 
 /**
@@ -16,26 +15,27 @@ import peerNode.Leader;
  */
 public class ElectionBroadcast extends Thread{
     
-    private HashSet<Message> messages;
+    private static HashSet<Message> messages;
     private final Leader leader;
-    private Timer timer = null;
     private static final int WAIT_TIME = 4000;
     
-    public ElectionBroadcast(Leader leader) {
+    private ElectionBroadcast(Leader leader) {
         this.leader = leader;
         messages = new HashSet<Message>();
+        Message message = new Message(MessageType.ELECT, "");
+        Broadcast.sendBroadcast(message);
+        start();
     }
     
-    public synchronized void voteSelf() throws UnknownHostException {
+    public static synchronized void voteSelf(Leader leader) throws UnknownHostException {
         
-        if (!isAlive()) {
-            Message message = new Message(MessageType.ELECT, "");
-            Broadcast.sendBroadcast(message);
-            start();
+        if (!leader.electingLeader()) {
+            leader.electionStarted();
+            new ElectionBroadcast(leader);
         }
     }
     
-    public void addElection(Message message) throws UnknownHostException {
+    public static void addElection(Message message) throws UnknownHostException {
 
         messages.add(message);
     }
@@ -67,6 +67,6 @@ public class ElectionBroadcast extends Thread{
             }
         } catch (UnknownHostException | InterruptedException ex) {
             System.out.println(ex);
-        } 
+        }
     }
 }
