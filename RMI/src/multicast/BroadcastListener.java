@@ -42,7 +42,6 @@ public abstract class BroadcastListener extends Thread {
                     socket.receive(inPacket);
                     String packetString = new String(inBuf, 0, inPacket.getLength());
                     Message message = gson.fromJson(packetString, Message.class);
-                    System.out.println("Message Recieved");
                     broadcastRecieved(message);
                 }
             } catch (IOException e) {

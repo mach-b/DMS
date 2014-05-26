@@ -19,7 +19,7 @@ public class ElectionBroadcast extends Thread{
     private HashSet<Message> messages;
     private final Leader leader;
     private Timer timer = null;
-    private static final int WAIT_TIME = 1000;
+    private static final int WAIT_TIME = 4000;
     
     public ElectionBroadcast(Leader leader) {
         this.leader = leader;
@@ -29,13 +29,11 @@ public class ElectionBroadcast extends Thread{
     public void voteSelf() throws UnknownHostException {
         Message message = new Message(MessageType.ELECT, "");
         Broadcast.sendBroadcast(message);
-        if (!isAlive()) 
-            start();
+        start();
     }
     
     public void addElection(Message message) throws UnknownHostException {
-        if (!isAlive()) 
-            start();
+
         messages.add(message);
     }
     
@@ -60,8 +58,10 @@ public class ElectionBroadcast extends Thread{
         // A sleeping process that is waiting for leader responces
         try {
             sleep(WAIT_TIME);
-            if (leader.hasLeader())
-            chooseLeader();
+            if (!leader.hasLeader()) {
+                // Choose a leader if one has not been declared
+                chooseLeader();
+            }
         } catch (UnknownHostException | InterruptedException ex) {
             System.out.println(ex);
         } 

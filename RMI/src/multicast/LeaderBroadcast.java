@@ -13,7 +13,7 @@ import peerNode.Leader;
 public class LeaderBroadcast extends Thread {
     
     private Leader leader;
-    private static final int WAIT_TIME = 1500;
+    private static final int WAIT_TIME = 5500;
     
     public LeaderBroadcast(Leader leader) {
         this.leader = leader;
@@ -40,6 +40,6 @@ public class LeaderBroadcast extends Thread {
         if (!leader.hasLeader()) {
             message = new Message(MessageType.ELECTION, "Begin election from LeaderBroadcast");
             Broadcast.sendBroadcast(message);
-        }
+        } 
     }
 }

@@ -61,7 +61,7 @@ public class Leader {
      */
     public synchronized boolean hasLeader() {
         
-        return leaderIp != null || !isLeader;
+        return leaderIp != null;
     }
     
     /**
