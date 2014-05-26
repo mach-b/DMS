@@ -71,12 +71,8 @@ public class Leader {
     public void broadcastLeader() {
         
         if (hasLeader() && !electingLeader && isLeader) {
-            try {
-                Message message = new Message(MessageType.DECLARE_LEADER, Message.getIPString());
-                Broadcast.sendBroadcast(message);
-            } catch (UnknownHostException ex) {
-                System.out.println(ex);
-            }
+            Message message = new Message(MessageType.DECLARE_LEADER, Message.getIPString());
+            Broadcast.sendBroadcast(message);
         }
     }
     

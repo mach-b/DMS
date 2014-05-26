@@ -42,7 +42,7 @@ public class LeaderBroadcast extends Thread {
                 Broadcast.sendBroadcast(message);
             }
             
-        } catch (UnknownHostException | InterruptedException ex) {
+        } catch (InterruptedException ex) {
             
             System.out.println(ex);
         }
