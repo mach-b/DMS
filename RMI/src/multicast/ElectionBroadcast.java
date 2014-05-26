@@ -26,10 +26,13 @@ public class ElectionBroadcast extends Thread{
         messages = new HashSet<Message>();
     }
     
-    public void voteSelf() throws UnknownHostException {
-        Message message = new Message(MessageType.ELECT, "");
-        Broadcast.sendBroadcast(message);
-        start();
+    public synchronized void voteSelf() throws UnknownHostException {
+        
+        if (!isAlive()) {
+            Message message = new Message(MessageType.ELECT, "");
+            Broadcast.sendBroadcast(message);
+            start();
+        }
     }
     
     public void addElection(Message message) throws UnknownHostException {

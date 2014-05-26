@@ -5,6 +5,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -26,6 +29,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
     private final int TIMER_DELAY = 10000;
     private final Timer TIMER = new Timer(TIMER_DELAY, this);
     private final SharedFiles SHARED_FILES;
+    private final PeerNode PEER_NODE;
     private final Leader LEADER;
 
     /**
@@ -38,7 +42,8 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         
         initComponents();
         SHARED_FILES = new SharedFiles();
-        LEADER = new PeerNode(SHARED_FILES).getLeader();
+        PEER_NODE = new PeerNode(SHARED_FILES);
+        LEADER = PEER_NODE.getLeader();
         try {
             Thread.sleep(TIMER_DELAY);
         } catch (InterruptedException ex) { }
@@ -87,6 +92,10 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblRemoteFiles = new javax.swing.JTable();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        mnuSnapshot = new javax.swing.JMenuItem();
+        mnuAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -136,6 +145,28 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         });
         jScrollPane3.setViewportView(tblRemoteFiles);
 
+        jMenu1.setText("File");
+
+        mnuSnapshot.setText("Snapshot");
+        mnuSnapshot.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSnapshotActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuSnapshot);
+
+        mnuAbout.setText("About");
+        mnuAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAboutActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuAbout);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -156,7 +187,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
@@ -167,8 +198,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLoadFile)
-                    .addComponent(btnSaveFile))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnSaveFile)))
         );
 
         pack();
@@ -202,7 +232,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
      * When the 'Download File' button is clicked the app will then download the
      * file to the RMIFileExchangeFolder
      * 
-     * @param evt 
+     * @param evt the event that triggered the method
      */
     private void btnSaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveFileActionPerformed
         
@@ -221,6 +251,35 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
     }//GEN-LAST:event_btnSaveFileActionPerformed
 
     /**
+     * Display the current network snapshot of time stamps
+     * 
+     * @param evt the event that triggered the method
+     */
+    private void mnuSnapshotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSnapshotActionPerformed
+        
+        HashMap<String, String> timeStamps = PEER_NODE.getTimeStamps();
+        String snapshot = "System Snapshot\n";
+        for (Map.Entry entry: timeStamps.entrySet()) {
+            // Iterate through the map and add values to the result
+            snapshot += "\nIP:" + entry.getKey() + " Vector:" + entry.getValue();
+        }
+        displayMessage("Snapshot", snapshot);
+    }//GEN-LAST:event_mnuSnapshotActionPerformed
+
+    /**
+     * An about dialog of what the project is and the developers
+     * 
+     * @param evt the event that triggered the method
+     */
+    private void mnuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAboutActionPerformed
+        
+        displayMessage("About", 
+                "Assignment 3 for Distributed and Mobile Systems\nAUT University\n\n" + 
+                "Developers:\nMark Burton\nKerry Powell\n\n" + 
+                "Project documentation: https://docs.google.com/document/d/1NvZDwnp1w00ZrV0N0s1phjEw-39t5YPyos5dIJ5lPGY/edit?usp=sharing");
+    }//GEN-LAST:event_mnuAboutActionPerformed
+
+    /**
      * Display a warning dialog box to the user
      * 
      * @param message the message to be displayed
@@ -230,6 +289,18 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
                 message,
                 "Download warning",
                 JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
+     * Display a message dialog box to the user
+     * 
+     * @param message the message to be displayed
+     */
+    private void displayMessage(String title, String message) {
+        JOptionPane.showMessageDialog(this,
+                message,
+                title,
+                JOptionPane.INFORMATION_MESSAGE);
     }
     
     /**
@@ -308,8 +379,12 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JList fileListLocal;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JMenuItem mnuAbout;
+    private javax.swing.JMenuItem mnuSnapshot;
     private javax.swing.JTable tblRemoteFiles;
     // End of variables declaration//GEN-END:variables
 

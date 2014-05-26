@@ -1,15 +1,16 @@
 package peerNode;
 
-import message.Message;
-import message.MessageType;
-import multicast.BroadcastListener;
-import multicast.DirectMessage;
-import multicast.ElectionBroadcast;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import message.Message;
+import message.MessageType;
+import multicast.Broadcast;
+import multicast.BroadcastListener;
+import multicast.DirectMessage;
+import multicast.ElectionBroadcast;
 import share.SharedFiles;
 
 /**
@@ -21,18 +22,16 @@ import share.SharedFiles;
  */
 public class PeerNode extends BroadcastListener {
 
-    private final Leader leader;
-    private final SharedFiles sharedFiles;
-    private final ElectionBroadcast electionBroadcast;
-    private HashMap timeStampHM;
-    public final String ipAddress;
+    private final Leader LEADER;
+    private final SharedFiles SHARED_FILES;
+    private final ElectionBroadcast ELECTION_BROADCASTER;
+    private final HashMap TIME_STAMPS;
 
     public PeerNode(SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
-        this.leader = new Leader();
-        this.sharedFiles = sharedFiles;
-        electionBroadcast = new ElectionBroadcast(leader);
-        timeStampHM = new HashMap();
-        ipAddress = Message.getIPString();
+        this.LEADER = new Leader();
+        this.SHARED_FILES = sharedFiles;
+        ELECTION_BROADCASTER = new ElectionBroadcast(LEADER);
+        TIME_STAMPS = new HashMap();
     }
 
     /**
@@ -41,46 +40,62 @@ public class PeerNode extends BroadcastListener {
      * @return the leader object for the application
      */
     public Leader getLeader() {
-        return leader;
+        return LEADER;
+    }
+    
+    /**
+     * Get the time stamps to make a snapshot of the system
+     * 
+     * @return a map with the network snapshot
+     */
+    public HashMap getTimeStamps() {
+        
+        Message message = new Message(MessageType.REQUEST_SNAPSHOT, "");
+        Broadcast.sendBroadcast(message);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex) {}
+        return TIME_STAMPS;
     }
 
     @Override
     public synchronized void broadcastRecieved(Message message) {
-        System.out.println("Message Object Properties: "
-                + message.getMessageType().toString() + " "
-                + message.getSenderIPAddress());
-        updateTimeStamps(message.getSenderIPAddress(), message.getTimeStamp());
-        try {
-            switch (message.getMessageType()) {
-                case ELECTION:
-                    startElection();
-                    break;
-                case ELECT:
-                    electionBroadcast.addElection(message);
-                    break;
-                case DECLARE_LEADER:
-                    leader.setLeader(message);
-                    break;
-                case PEER_LOST:
-                    //Tell leader to remove ip address from files
-                    sharedFiles.peerLost(message);
-                    break;
-                case FIND_LEADER:
-                    //Broadcast request for who is the leader
-                    leader.broadcastLeader();
-                    break;
-                case REQUEST_SNAPSHOT:  // Request snapshot to include requester's IP in message content.
-                    //DirectMessage sender
-                    Message m = new Message(MessageType.SUPPLY_TIMESTAMP,
-                            message.getSenderIPAddress(), "Supplying Timestamp");
-                    DirectMessage.sendDirectMessage(m, m.getRecipientIPAddress());
-                    break;
-                case SUPPLY_TIMESTAMP:
-                    break;
+        
+        if (updateTimeStamps(message)) {
+            System.out.println("Message Recieved: " + message.toString());
+            try {
+                switch (message.getMessageType()) {
+                    case ELECTION:
+                        startElection();
+                        break;
+                    case ELECT:
+                        ELECTION_BROADCASTER.addElection(message);
+                        break;
+                    case DECLARE_LEADER:
+                        LEADER.setLeader(message);
+                        break;
+                    case PEER_LOST:
+                        //Tell leader to remove ip address from files
+                        SHARED_FILES.peerLost(message);
+                        break;
+                    case FIND_LEADER:
+                        //Broadcast request for who is the leader
+                        LEADER.broadcastLeader();
+                        break;
+                    case REQUEST_SNAPSHOT:  // Request snapshot to include requester's IP in message content.
+                        //DirectMessage sender
+                        Message reply = new Message(MessageType.SUPPLY_TIMESTAMP,
+                                message.getSenderIPAddress(), "Supplying Timestamp");
+                        DirectMessage.sendDirectMessage(reply);
+                        break;
+                    case SUPPLY_TIMESTAMP:
+                        break;
+                } 
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(PeerNode.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            System.out.println("Message Ignored: " + message.toString()); 
         }
     }
 
@@ -91,8 +106,8 @@ public class PeerNode extends BroadcastListener {
      */
     private synchronized void startElection() throws UnknownHostException {
 
-        electionBroadcast.voteSelf();
-        leader.electionStarted();
+        ELECTION_BROADCASTER.voteSelf();
+        LEADER.electionStarted();
     }
 
     /**
@@ -101,9 +116,19 @@ public class PeerNode extends BroadcastListener {
      * @param senderIPAddress the IP address of the sender
      * @param timeStamp the timestamp from the sender
      */
-    private void updateTimeStamps(String senderIPAddress, long timeStamp) {
-        if (timeStamp > -1) {
-            timeStampHM.put(senderIPAddress, timeStamp);
+    private boolean updateTimeStamps(Message message) {
+        
+        long returnValue = 0;
+        try {
+            returnValue = (long)TIME_STAMPS.get(message.getSenderIPAddress());
+        } catch (Exception ex) {
+            System.out.println(TIME_STAMPS.get(message.getSenderIPAddress()) + "-" + ex);
         }
+        if (returnValue < message.getTimeStamp()) {
+
+            TIME_STAMPS.put(message.getSenderIPAddress(), message.getTimeStamp());
+            return true;
+        }
+        return false;
     }
 }
