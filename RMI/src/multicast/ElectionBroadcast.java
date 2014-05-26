@@ -1,70 +1,45 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package multicast;
 
 import message.MessageType;
 import message.Message;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Timer;
 import peerNode.Leader;
 
 /**
  *
  * @author Mark Burton and Kerry Powell
+ * @version 1.1
  */
-public class ElectionBroadcast implements ActionListener{
+public class ElectionBroadcast extends Thread{
     
     private HashSet<Message> messages;
     private final Leader leader;
     private Timer timer = null;
+    private static final int WAIT_TIME = 1000;
     
     public ElectionBroadcast(Leader leader) {
         this.leader = leader;
         messages = new HashSet<Message>();
     }
     
-    private synchronized void startTimer() {
-        if (timer == null) {
-            timer = new Timer(10000, this);
-            timer.start();
-        }
-    }
-    
-    private synchronized void stopTimer() {
-        if (timer != null) {
-            if (timer.isRunning()) 
-                timer.stop();
-            timer = null;
-        }
-    }
-    
-    public void beginElection() throws UnknownHostException {
-        Message message = new Message(MessageType.ELECTION, "");
-        Broadcast.sendBroadcast(message); //send message
-    }
-    
     public void voteSelf() throws UnknownHostException {
         Message message = new Message(MessageType.ELECT, "");
         Broadcast.sendBroadcast(message);
-        startTimer();
+        if (!isAlive()) 
+            start();
     }
     
     public void addElection(Message message) throws UnknownHostException {
-        startTimer();
+        if (!isAlive()) 
+            start();
         messages.add(message);
     }
     
     private void chooseLeader() throws UnknownHostException {
-        stopTimer();
+
         //find the leader in the messages
         String leaderIP = "";
         Iterator<Message> itr = messages.iterator();
@@ -80,12 +55,14 @@ public class ElectionBroadcast implements ActionListener{
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void run() {
+        // A sleeping process that is waiting for leader responces
         try {
+            sleep(WAIT_TIME);
+            if (leader.hasLeader())
             chooseLeader();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(ElectionBroadcast.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (UnknownHostException | InterruptedException ex) {
+            System.out.println(ex);
+        } 
     }
-    
 }

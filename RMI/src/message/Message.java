@@ -29,6 +29,7 @@ public class Message {
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
+        messageCreated();
     }
     
     public Message(MessageType messageType, String messageContent) {
@@ -37,6 +38,7 @@ public class Message {
         this.recipientIPAddress = "broadcast";
         this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
+        messageCreated();
     }
     
     /**
@@ -52,6 +54,11 @@ public class Message {
         this.recipientIPAddress = recipientIPAddress;
         this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;
+        messageCreated();
+    }
+    
+    private void messageCreated() {
+        System.out.println("Message made, message type: " + messageType.toString());
     }
     
     private synchronized static long getNewTimeStamp() {
