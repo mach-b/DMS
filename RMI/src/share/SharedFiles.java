@@ -177,7 +177,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         } else if(leader.getLeaderIp() != null){
             try {
                 Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), 1099);
-                return (SharedFilesRMI) reg.lookup("SharedFiles");
+                return (SharedFilesRMI) reg.lookup(CLASS_NAME+leader.getLeaderId());
             }catch (Exception e){
                 System.out.println(e);
             }
@@ -198,7 +198,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         try {
             // Create the registry and add this as an RMI
             Registry reg = LocateRegistry.createRegistry(PORT);
-            reg.bind(CLASS_NAME, this);
+            reg.bind(CLASS_NAME+Message.getMasterID(), this);
         } catch (Exception ex) {
             System.err.println(ex);
         }    

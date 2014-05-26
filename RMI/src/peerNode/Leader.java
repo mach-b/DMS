@@ -15,6 +15,7 @@ import multicast.LeaderBroadcast;
 public class Leader {
     
     private String leaderIp = null;
+    private String leaderId = null;
     private boolean isLeader = false;
     private boolean electingLeader = false;
     
@@ -36,6 +37,10 @@ public class Leader {
         return electingLeader;
     }
     
+    public String getLeaderId() {
+        return leaderId;
+    }
+    
     /**
      * Set who the current leader is
      * 
@@ -44,7 +49,8 @@ public class Leader {
     public synchronized void setLeader(Message message) {
         
         leaderIp = message.getMessageContent();
-        isLeader = message.getID().equals(Message.getMasterID());
+        leaderId = message.getID();
+        isLeader = leaderId.equals(Message.getMasterID());
         electingLeader = false;
     }
     
@@ -54,6 +60,7 @@ public class Leader {
     public synchronized void electionStarted() {
         
         leaderIp = null;
+        leaderId = null;
         isLeader = false;
         electingLeader = true;
     }

@@ -45,13 +45,7 @@ public class Message {
      * @param messageContent String Any content to include
      */
     public Message(MessageType messageType, String messageContent) {
-        this.messageType = messageType;
-        this.senderIPAddress = getIPString();
-        this.recipientIPAddress = "broadcast";
-        this.timeStamp = getNewTimeStamp();
-        this.messageContent = messageContent;  // perhaps a filename?
-        this.id = getMasterID();
-        messageCreated();
+        this(messageType, "broadcast", messageContent);
     }
     
     /**
@@ -62,13 +56,7 @@ public class Message {
      * @param messageContent String Any content to include
      */
     public Message(MessageType messageType, String recipientIPAddress, String messageContent) {
-        this.messageType = messageType;
-        this.senderIPAddress = getIPString();
-        this.recipientIPAddress = recipientIPAddress;
-        this.timeStamp = getNewTimeStamp();
-        this.messageContent = messageContent;
-        this.id = getMasterID();
-        messageCreated();
+        this(messageType, getIPString(), recipientIPAddress , messageContent);
     }
     
     public static String getMasterID() {
