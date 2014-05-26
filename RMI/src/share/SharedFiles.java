@@ -1,8 +1,7 @@
 package share;
 
-import Message.Message;
-import Message.MessageType;
-import Multicast.Broadcast;
+import message.Message;
+import message.MessageType;
 import java.io.File;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import multicast.Broadcast;
 import peerNode.Leader;
 import rmi.SharedFilesRMI;
 
@@ -26,7 +26,6 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
 
     private Set<File> files;
     private ArrayList<RemoteFiles> remoteFiles = new ArrayList<>();
-    
     private static final int PORT = 1099; 
     private static final String CLASS_NAME = "SharedFiles";
     
@@ -62,9 +61,16 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
             Message message = new Message(MessageType.PEER_LOST, ip);
             Broadcast.sendBroadcast(message);
         }
+        return null;
     }  
     
-    public void add 
+    /**
+     * Creates a new array list for storing remote files effectively clearing 
+     * the old list
+     */
+    public void clearRemoteFilesArray() {
+        remoteFiles = new ArrayList<>();
+    }
     
     /**
      * When the connection to a peer has been lost all remote files for that 
@@ -149,7 +155,8 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
             } catch (RemoteException ex) {
                 // Connecting to the leader failed so an election has been requested
                 System.out.println(ex);
-                Message message = new Message(MessageType.ELECTION, "Remote SahredFilesRMI not found");
+                Message message = new Message(MessageType.ELECTION, 
+                        "Remote SahredFilesRMI not found");
                 Broadcast.sendBroadcast(message);
             }
         }
@@ -178,7 +185,12 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         return null;
     }
     
-        /**
+    
+    /* ---------------------------------------------------------------------- */
+    /*                          RMI Implimentations                           */
+    /* ---------------------------------------------------------------------- */
+    
+    /**
      * Registers the class to be accessed via RMI
      */
     private void registerRMI() {

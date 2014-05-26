@@ -1,11 +1,10 @@
 package peerNode;
 
-import Message.Message;
-import Message.MessageType;
-import Multicast.BroadcastListener;
-import Multicast.DirectMessage;
-import Multicast.ElectionBroadcast;
-import java.net.InetAddress;
+import message.Message;
+import message.MessageType;
+import multicast.BroadcastListener;
+import multicast.DirectMessage;
+import multicast.ElectionBroadcast;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -28,12 +27,21 @@ public class PeerNode extends BroadcastListener {
     private HashMap timeStampHM;
     public final String ipAddress;
 
-    public PeerNode(Leader leader, SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
+    public PeerNode(SharedFiles sharedFiles) throws UnknownHostException, RemoteException {
         this.leader = new Leader();
         this.sharedFiles = sharedFiles;
         electionBroadcast = new ElectionBroadcast(new Leader());
         timeStampHM = new HashMap();
-        ipAddress = getPeerIPString();
+        ipAddress = Message.getIPString();
+    }
+
+    /**
+     * Get the leader object created by the peer node
+     * 
+     * @return the leader object for the application
+     */
+    public Leader getLeader() {
+        return leader;
     }
 
     @Override
@@ -88,30 +96,14 @@ public class PeerNode extends BroadcastListener {
     }
 
     /**
-     *
-     * @param args
-     * @throws UnknownHostException
-     * @throws java.rmi.RemoteException
+     * Update the timestamp for a given IP address
+     * 
+     * @param senderIPAddress the IP address of the sender
+     * @param timeStamp the timestamp from the sender
      */
-    public static void main(String[] args) throws UnknownHostException, RemoteException {
-
-        System.out.println("Address = " + InetAddress.getLocalHost());
-    }
-
     private void updateTimeStamps(String senderIPAddress, long timeStamp) {
         if (timeStamp > -1) {
             timeStampHM.put(senderIPAddress, timeStamp);
         }
     }
-
-    public static String getPeerIPString() {
-        try {
-            String s = InetAddress.getLocalHost().toString();
-            String[] segments = s.split("/");
-            return segments[segments.length - 1];
-        } catch (UnknownHostException ex) {
-            return "";
-        }
-    }
-
 }

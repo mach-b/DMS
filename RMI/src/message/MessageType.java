@@ -1,7 +1,8 @@
-package Message;
+package message;
 
 /**
- *
+ * Message type enum for when sending messages
+ * 
  * @author Mark Burton and Kerry Powell
  */
 public enum MessageType {

@@ -3,10 +3,8 @@ package share;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.rmi.NotBoundException;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -14,7 +12,7 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import peerNode.Leader;
-import peerNode.LeaderElector;
+import peerNode.PeerNode;
 
 /**
  * The UI for sharing files between two or more applications over a local network
@@ -24,19 +22,27 @@ import peerNode.LeaderElector;
  */
 public class ShareUI extends javax.swing.JFrame implements ActionListener {
     
-    final private JFileChooser fc = new JFileChooser();
-    final private SharedFiles sharedFiles;
-    final private Timer timer = new Timer(10000, this);
-    final private Leader leader;
+    private final JFileChooser FILE_CHOOSER = new JFileChooser();
+    private final int TIMER_DELAY = 10000;
+    private final Timer TIMER = new Timer(TIMER_DELAY, this);
+    private final SharedFiles SHARED_FILES;
+    private final Leader LEADER;
 
     /**
      * Creates new form ShareUI
+     * 
+     * @throws RemoteException when 
+     * @throws UnknownHostException
      */
-    public ShareUI() throws RemoteException {
+    public ShareUI() throws RemoteException, UnknownHostException {
         
         initComponents();
-        sharedFiles = new SharedFiles();
-        leader = new PeerNode.getLeader();
+        SHARED_FILES = new SharedFiles();
+        LEADER = new PeerNode(SHARED_FILES).getLeader();
+        try {
+            Thread.sleep(TIMER_DELAY);
+        } catch (InterruptedException ex) { }
+        TIMER.start();
     }
     
     /**
@@ -176,20 +182,20 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
      */
     private void btnLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadFileActionPerformed
         
-        int returnVal = fc.showOpenDialog(this);
+        int returnVal = FILE_CHOOSER.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             
-            File file = fc.getSelectedFile();
-            if (sharedFiles.addFile(file)) {
+            File file = FILE_CHOOSER.getSelectedFile();
+            if (SHARED_FILES.addFile(file)) {
                 
                 System.out.println("File added:" + file.getName());
-                updateFileListLocal(sharedFiles.getFileNames());
+                updateFileListLocal(SHARED_FILES.getFileNames());
                 //tell the leader the list has changed
             } else {
                 
                 System.out.println("File not added");
             }
-        } 
+        }
     }//GEN-LAST:event_btnLoadFileActionPerformed
 
     /**
@@ -205,16 +211,11 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
             
             String ip = selection[0];
             String fileName = selection[1];
-            try {
-                
-                File file = SharedFiles.getRemoteFile(ip, fileName);
-                saveFile(file);
-            } catch (RemoteException ex) {
-                
-                downloadWarning("Failed to connect to remote host:\n\n" + ex.getMessage());
-            } catch (NotBoundException ex) {
-                
-                downloadWarning("Failed to get remote files:\n\n" + ex.getMessage());
+            File file = SHARED_FILES.getRemoteFile(ip, fileName);
+            DirectoryManager.saveFile(file); 
+            if (file == null) {
+
+                downloadWarning("Failed to get remote files from host:\n\nHost not found");
             }
         }
     }//GEN-LAST:event_btnSaveFileActionPerformed
@@ -260,17 +261,6 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
     }
     
     /**
-     * Save a file to RMIFileExchangeFolder, check if file was not void and alerts
-     * user if file already exists
-     * 
-     * @param file to be saved
-     */
-    private void saveFile(File file) {
-        
-        
-    }
-    
-    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -302,8 +292,9 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
             
             public void run() {
                 try {
+                    
                     new ShareUI().setVisible(true);
-                } catch (RemoteException ex) {
+                } catch (RemoteException | UnknownHostException ex) {
                     
                     System.err.println(ex);
                 }
@@ -324,10 +315,12 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
 
     @Override
     public synchronized void actionPerformed(ActionEvent e) {
-        
-        String[][] remoteList = sharedFiles.getAllRemoteFiles(null);
-        if (remoteList != null) {
-            updateFileListRemote(remoteList);
+        //A timer action for every 10000ms to refresh the remote list
+        if (LEADER.hasLeader()) {
+            String[][] remoteList = SHARED_FILES.getAllRemoteFiles(LEADER);
+            if (remoteList != null) {
+                updateFileListRemote(remoteList);
+            }
         }
     }
 }

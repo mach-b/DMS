@@ -3,23 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/SendBroadcast.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/BroadcastListener.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/rmi/RMIServer.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/share/ShareUI.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/rmi/LeaderRMI.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/peerNode/Leader.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/Broadcast.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/ElectionBroadcast.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/DirectConnectionListener.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Message/Message.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/peerNode/LeaderElector.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/share/SharedFiles.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/rmi/SharedFilesRMI.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Multicast/SendMessage.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/peerNode/PeerNode.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/rmi/RMIClient.java</file>
-            <file>file:/Users/markburton/DMS/RMI/src/Message/MessageType.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/message/Message.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/peerNode/Leader.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/BroadcastListener.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/LeaderBroadcast.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/ShareUI.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/message/MessageType.java</file>
         </group>
     </open-files>
 </project-private>

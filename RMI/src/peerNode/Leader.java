@@ -1,10 +1,9 @@
 package peerNode;
 
-import Message.Message;
-import Message.MessageType;
-import Multicast.Broadcast;
-import Multicast.LeaderBroadcast;
-import java.net.UnknownHostException;
+import message.Message;
+import message.MessageType;
+import multicast.Broadcast;
+import multicast.LeaderBroadcast;
 
 /**
  * A class that handles finding the networks leader and electing the leader, is 
@@ -71,6 +70,7 @@ public class Leader {
     public void broadcastLeader() {
         
         if (hasLeader() && !electingLeader && isLeader) {
+
             Message message = new Message(MessageType.DECLARE_LEADER, Message.getIPString());
             Broadcast.sendBroadcast(message);
         }

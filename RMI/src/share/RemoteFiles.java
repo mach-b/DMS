@@ -1,6 +1,6 @@
 package share;
 
-import Message.Message;
+import message.Message;
 
 /**
 * Hold the file names and ip addresses in a convenient class to be passed 

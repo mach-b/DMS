@@ -1,8 +1,7 @@
-package Multicast;
+package multicast;
 
-import Message.Message;
-import Message.MessageType;
-import java.net.UnknownHostException;
+import message.Message;
+import message.MessageType;
 import peerNode.Leader;
 
 /**
@@ -30,22 +29,17 @@ public class LeaderBroadcast extends Thread {
     public void run() {
         
         Message message;
+        // Send a broadcast to request who is the leader
+        message = new Message(MessageType.FIND_LEADER, "Find leader from LeaderBroadcast");
+        Broadcast.sendBroadcast(message);
         try {
-            // Send a broadcast to request who is the leader
-            message = new Message(MessageType.FIND_LEADER, "Find leader from LeaderBroadcast");
-            Broadcast.sendBroadcast(message);
             // Wait for a response
             sleep(WAIT_TIME);
-            // If a leader has not been set, declear election
-            if (!leader.hasLeader()) {
-                message = new Message(MessageType.ELECTION, "Begin election from LeaderBroadcast");
-                Broadcast.sendBroadcast(message);
-            }
-            
-        } catch (InterruptedException ex) {
-            
-            System.out.println(ex);
+        } catch (InterruptedException ex) { }
+        // If a leader has not been set, declear election
+        if (!leader.hasLeader()) {
+            message = new Message(MessageType.ELECTION, "Begin election from LeaderBroadcast");
+            Broadcast.sendBroadcast(message);
         }
-        
     }
 }

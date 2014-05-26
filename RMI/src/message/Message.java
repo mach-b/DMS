@@ -1,12 +1,11 @@
-package Message;
+package message;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * 
+ * 
  * @author Mark Burton, Kerry Powell
  */
 public class Message {
@@ -18,10 +17,10 @@ public class Message {
     
     /**
      * A Message
+     * 
      * @param messageType String The type of Message
      * @param senderIPAddress String The senders address
      * @param recipientIPAddress String The recipients address
-     * @param timestamp The timestamp
      * @param messageContent String Any content to include
      */
     public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, String messageContent)  {
@@ -42,9 +41,9 @@ public class Message {
     
     /**
      * This constructor is primarily to respond to snapshot requests
+     * 
      * @param messageType  
-     * @param recipientIPAddress  Recipient IP Address
-     * @param timeStamp  
+     * @param recipientIPAddress  Recipient IP Address 
      * @param messageContent 
      */
     public Message(MessageType messageType, String recipientIPAddress, String messageContent) {

@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package Multicast;
+package multicast;
 
-import Message.Message;
+import message.Message;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
