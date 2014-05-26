@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -220,7 +219,6 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
                 
                 System.out.println("File added:" + file.getName());
                 updateFileListLocal(SHARED_FILES.getFileNames());
-                //tell the leader the list has changed
             } else {
                 
                 System.out.println("File not added");
@@ -276,8 +274,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         
         displayMessage("About", 
                 "Assignment 3 for Distributed and Mobile Systems\nAUT University\n\n" + 
-                "Developers:\nMark Burton\nKerry Powell\n\n" + 
-                "Project documentation: https://docs.google.com/document/d/1NvZDwnp1w00ZrV0N0s1phjEw-39t5YPyos5dIJ5lPGY/edit?usp=sharing");
+                "Developers:\nMark Burton\nKerry Powell\n\n");
     }//GEN-LAST:event_mnuAboutActionPerformed
 
     /**

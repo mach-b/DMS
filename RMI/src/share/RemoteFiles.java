@@ -1,5 +1,6 @@
 package share;
 
+import java.io.Serializable;
 import message.Message;
 
 /**
@@ -9,7 +10,7 @@ import message.Message;
 * @author Kerry Powell
 * @version 1.0
 */
-public class RemoteFiles {
+public class RemoteFiles implements Serializable{
 
     private String ip = "";
     private String[] array = new String[0];

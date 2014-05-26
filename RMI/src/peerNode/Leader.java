@@ -48,7 +48,7 @@ public class Leader {
      */
     public synchronized void setLeader(Message message) {
         
-        leaderIp = message.getMessageContent();
+        leaderIp = message.getMessageContent().split(":")[0];
         leaderId = message.getID();
         isLeader = leaderId.equals(Message.getMasterID());
         electingLeader = false;

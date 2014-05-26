@@ -43,15 +43,14 @@ public class ElectionBroadcast extends Thread{
     private void chooseLeader() throws UnknownHostException {
 
         //find the leader in the messages
-        String leaderIP = "";
-        Iterator<Message> itr = messages.iterator();
-        while(itr.hasNext()) {
-            if(itr.next().getSenderIPAddress().compareTo(leaderIP)<1) {
-                leaderIP = itr.next().getSenderIPAddress();
+        String leaderID = "";
+        for (Message message: messages) {
+            if(message.getID().compareTo(leaderID)<1) {
+                leaderID = message.getID();
             }
         }
         //broadcast messages
-        Message m = new Message(MessageType.DECLARE_LEADER, leaderIP);
+        Message m = new Message(MessageType.DECLARE_LEADER, leaderID);
         Broadcast.sendBroadcast(m);
         messages = new HashSet<Message>();
     }

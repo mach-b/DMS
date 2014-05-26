@@ -1,6 +1,7 @@
 package share;
 
 import java.io.File;
+import java.io.Serializable;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,7 +23,7 @@ import share.rmi.SharedFilesRMI;
  * @author Kerry Powell
  * @version 1.1
  */
-public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
+public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, Serializable {
 
     private Set<File> files;
     private ArrayList<RemoteFiles> remoteFiles = new ArrayList<>();
@@ -129,32 +130,67 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
         if (rmi != null) {
         
             String myIp = Message.getIPString();
+            
             try {
-                
+                // Updating the list held by the leader
+                rmi.updateFileNames(new RemoteFiles(getFileNames()));
+            } catch (RemoteException ex) {
+                System.out.println("Failed to update leader:\n" + ex);
+            }
+            
+            try {
+                // Getting the list from the leader
                 ArrayList<RemoteFiles> remoteFiles = rmi.getAllFileNames();
                 int filesCount = 0;
                 for (RemoteFiles files: remoteFiles) {
                     //Count how many files there are
-                    if (!myIp.equals(files.getIp())) {
+                    //if (!myIp.equals(files.getIp())) {
                         filesCount += files.getArray().length;
-                    }
+                    //}
                 }
                 String[][] resultList = new String[filesCount][2];
                 for (RemoteFiles files: remoteFiles) {
                     //Count how many files there are
-                    if (!myIp.equals(files.getIp())) {
+                    //if (!myIp.equals(files.getIp())) {
                         for (String fileName: files.getArray()) {
+                            filesCount--;
                             resultList[filesCount][0] = files.getIp();
                             resultList[filesCount][1] = fileName;
-                            filesCount--;
                         }
-                    }
+                    //}
                 }
                 return resultList;
             
             } catch (RemoteException ex) {
                 // Connecting to the leader failed so an election has been requested
-                System.out.println(ex);
+                System.out.println("Failed to get update from leader:\n" + ex);
+            }
+        }
+        return null;
+    }
+    
+    /* ---------------------------------------------------------------------- */
+    /*                          RMI Implimentations                           */
+    /* ---------------------------------------------------------------------- */
+    
+    /**
+    * Go get the shared files on the leaders computer, if this app is the leader
+    * it will return itself
+    * 
+    * @param leader the elected leader on the network
+    * @return the SharedFilesRMI object on the remote computer
+    */
+    private SharedFilesRMI getSharedFilesRMI(Leader leader) {
+        
+        if (leader.isLeader()) {
+            System.out.println("Im the leader");
+            return this;
+        } else if(leader.getLeaderIp() != null){
+            try {
+                Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), 1099);
+                return (SharedFilesRMI) reg.lookup(CLASS_NAME+leader.getLeaderId());
+            }catch (Exception e){
+                System.out.println("Failed to connect to Leader RMI:\n" + e);
                 Message message = new Message(MessageType.ELECTION, 
                         "Remote SahredFilesRMI not found");
                 Broadcast.sendBroadcast(message);
@@ -164,39 +200,13 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI {
     }
     
     /**
-     * Go get the shared files on the leaders computer, if this app is the leader
-     * it will return itself
-     * 
-     * @param leader the elected leader on the network
-     * @return the SharedFilesRMI object on the remote computer
-     */
-    private SharedFilesRMI getSharedFilesRMI(Leader leader) {
-        
-        if (leader.isLeader()) {
-            return this;
-        } else if(leader.getLeaderIp() != null){
-            try {
-                Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), 1099);
-                return (SharedFilesRMI) reg.lookup(CLASS_NAME+leader.getLeaderId());
-            }catch (Exception e){
-                System.out.println(e);
-            }
-        }
-        return null;
-    }
-    
-    
-    /* ---------------------------------------------------------------------- */
-    /*                          RMI Implimentations                           */
-    /* ---------------------------------------------------------------------- */
-    
-    /**
      * Registers the class to be accessed via RMI
      */
     private void registerRMI() {
 
         try {
             // Create the registry and add this as an RMI
+            System.out.println("RMI: " + CLASS_NAME+Message.getMasterID());
             Registry reg = LocateRegistry.createRegistry(PORT);
             reg.bind(CLASS_NAME+Message.getMasterID(), this);
         } catch (Exception ex) {

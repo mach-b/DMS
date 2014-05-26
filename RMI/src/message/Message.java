@@ -59,7 +59,7 @@ public class Message {
         this(messageType, getIPString(), recipientIPAddress , messageContent);
     }
     
-    public static String getMasterID() {
+    public synchronized static String getMasterID() {
         
         if (masterId == null) {
             masterId = getIPString() + ":" + new Random().nextInt();
