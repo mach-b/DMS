@@ -11,5 +11,6 @@ public enum MessageType {
     DECLARE_LEADER,
     PEER_LOST,
     FIND_LEADER,
-    GET_SNAPSHOT;
+    REQUEST_SNAPSHOT,
+    SUPPLY_TIMESTAMP;
 }

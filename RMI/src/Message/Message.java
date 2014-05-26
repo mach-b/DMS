@@ -24,7 +24,7 @@ public class Message {
      * @param timestamp The timestamp
      * @param messageContent String Any content to include
      */
-    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, long timestamp, String messageContent) throws UnknownHostException {
+    public Message(MessageType messageType, String senderIPAddress, String recipientIPAddress, long timestamp, String messageContent)  {
         this.messageType = messageType;
         this.senderIPAddress = senderIPAddress;
         this.recipientIPAddress = recipientIPAddress;
@@ -32,12 +32,26 @@ public class Message {
         this.messageContent = messageContent;  // perhaps a filename?
     }
     
-    public Message(MessageType messageType, String messageContent) throws UnknownHostException {
+    public Message(MessageType messageType, String messageContent) {
         this.messageType = messageType;
         this.senderIPAddress = getIPString();
         this.recipientIPAddress = "broadcast";
         this.timeStamp = getTimeStamp();
         this.messageContent = messageContent;  // perhaps a filename?
+    }
+    
+    /**
+     * This constructor is primarily to respond to snapshot requests
+     * @param messageType  
+     * @param recipientIPAddress  Recipient IP Address
+     * @param timeStamp  
+     * @param messageContent 
+     */
+    public Message(MessageType messageType, String recipientIPAddress, long timeStamp) {
+        this.messageType = messageType;
+        this.senderIPAddress = getIPString();
+        this.recipientIPAddress = recipientIPAddress;
+        this.timeStamp = timeStamp;
     }
     
     private synchronized static long getNewTimeStamp() {
