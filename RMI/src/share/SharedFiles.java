@@ -38,6 +38,11 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
         registerRMI();
     }
     
+    /**
+     * Get the port number for the local object
+     * 
+     * @return the port number
+     */
     private int getPort() {
         if (port == 0) {
             port = Integer.parseInt(Message.getMasterID().split(":")[1]);
@@ -59,10 +64,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
             String ip = id.split(":")[0];
             int port = Integer.parseInt(id.split(":")[1]);
             Registry reg =  LocateRegistry.getRegistry(ip, port);
-            System.out.println("Registry found: " + CLASS_NAME + id);
-            
             SharedFilesRMI remoteFiles = (SharedFilesRMI) reg.lookup(CLASS_NAME + id);
-            System.out.println("rmi found");
             return remoteFiles.getFile(fileName);
             
         } catch (RemoteException ex) {
@@ -150,27 +152,21 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
             try {
                 // Getting the list from the leader
                 Map<String, RemoteFiles> remoteFiles = rmi.getAllFileNames();
-                
                 int filesCount = 0;
                 for (Map.Entry entry: remoteFiles.entrySet()) {
                     //Count how many files there are
-                    //if (!myIp.equals(files.getIp())) {
-                        RemoteFiles files = (RemoteFiles)entry.getValue();
-                        filesCount += files.getArray().length;
-                        System.out.println("filesCount = "+filesCount);
-                    //}
+                    RemoteFiles files = (RemoteFiles)entry.getValue();
+                    filesCount += files.getArray().length;
+                    System.out.println("filesCount = "+filesCount);
                 }
                 String[][] resultList = new String[filesCount][2];
                 for (Map.Entry entry: remoteFiles.entrySet()) {
-                    //Count how many files there are
-                    //if (!myIp.equals(files.getIp())) {
-                        RemoteFiles files = (RemoteFiles)entry.getValue();
-                        for (String fileName: files.getArray()) {
-                            filesCount--;
-                            resultList[filesCount][0] = files.getID();
-                            resultList[filesCount][1] = fileName;
-                        }
-                    //}
+                    RemoteFiles files = (RemoteFiles)entry.getValue();
+                    for (String fileName: files.getArray()) {
+                        filesCount--;
+                        resultList[filesCount][0] = files.getID();
+                        resultList[filesCount][1] = fileName;
+                    }
                 }
                 return resultList;
             
@@ -195,10 +191,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
     */
     private SharedFilesRMI getSharedFilesRMI(Leader leader) {
         
-        /*if (leader.isLeader()) {
-            System.out.println("Im the leader");
-            return this;
-        } else*/ if(leader.hasLeader()){
+        if(leader.hasLeader()){
             try {
                 int leaderPort = Integer.parseInt(leader.getLeaderId().split(":")[1]);
                 Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), leaderPort);  
@@ -221,7 +214,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
 
         try {
             // Create the registry and add this as an RMI
-            System.out.println("RMI: " + CLASS_NAME+Message.getMasterID());
+            System.out.println("RMI Name: " + CLASS_NAME+Message.getMasterID());
             Registry reg = LocateRegistry.createRegistry(getPort());
             reg.bind(CLASS_NAME+Message.getMasterID(), this); 
         } catch (Exception ex) {                                

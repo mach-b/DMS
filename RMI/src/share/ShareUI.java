@@ -396,7 +396,6 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
             String[][] remoteList = SHARED_FILES.getAllRemoteFiles(LEADER);
             if (remoteList != null) {
                 updateFileListRemote(remoteList);
-                System.out.println("Update Shared Files List Action");
             }
         }
     }

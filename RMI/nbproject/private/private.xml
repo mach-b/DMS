@@ -3,19 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/message/Message.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/RemoteFiles.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/peerNode/Leader.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/Broadcast.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/LeaderBroadcast.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/ShareUI.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/SharedFiles.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/peerNode/PeerNode.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/DirectoryManager.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/message/Message.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/BroadcastListener.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/LeaderBroadcast.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/DirectMessage.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/multicast/ElectionBroadcast.java</file>
-            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/message/MessageType.java</file>
+            <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/peerNode/PeerNode.java</file>
             <file>file:/Users/kerrypowell/Documents/Projects/DistributedMobile/Assignment3/DMS/RMI/src/share/rmi/SharedFilesRMI.java</file>
         </group>
     </open-files>
