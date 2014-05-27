@@ -143,7 +143,6 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
             try {
                 // Updating the list held by the leader
                 rmi.updateFileNames(new RemoteFiles(getFileNames()));
-                System.out.println("Updated leaders remote file list.");
                 
             } catch (RemoteException ex) {
                 System.out.println("Failed to update leader:\n" + ex);
@@ -157,7 +156,6 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
                     //Count how many files there are
                     RemoteFiles files = (RemoteFiles)entry.getValue();
                     filesCount += files.getArray().length;
-                    System.out.println("filesCount = "+filesCount);
                 }
                 String[][] resultList = new String[filesCount][2];
                 for (Map.Entry entry: remoteFiles.entrySet()) {
