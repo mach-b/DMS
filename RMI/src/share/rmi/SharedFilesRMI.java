@@ -3,7 +3,7 @@ package share.rmi;
 import java.io.File;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
+import java.util.Map;
 import share.RemoteFiles;
 
 /**
@@ -29,7 +29,7 @@ public interface SharedFilesRMI extends Remote{
      * @return the ip addresses(col=0) and remote file names(col=1)
      * @throws RemoteException if the remote object cannot be accessed
      */
-    public ArrayList<RemoteFiles> getAllFileNames() throws RemoteException;
+    public Map<String, RemoteFiles> getAllFileNames() throws RemoteException;
     
     /**
      * Add file names to the leaders registry of available files on the network

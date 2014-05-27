@@ -12,7 +12,7 @@ import message.Message;
 */
 public class RemoteFiles implements Serializable{
 
-    private String ip = "";
+    private String id = "";
     private String[] array = new String[0];
 
     /**
@@ -22,12 +22,12 @@ public class RemoteFiles implements Serializable{
      */
     public RemoteFiles(String[] fileNames) {
         
-        this.ip = Message.getIPString();
+        this.id = Message.getMasterID();
         this.array = fileNames;
     }
     
-    public String getIp() {
-        return ip;
+    public String getID() {
+        return id;
     }
     
     public String[] getArray() {

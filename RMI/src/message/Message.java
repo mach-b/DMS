@@ -62,7 +62,7 @@ public class Message {
     public synchronized static String getMasterID() {
         
         if (masterId == null) {
-            masterId = getIPString() + ":" + new Random().nextInt();
+            masterId = getIPString() + ":" + (new Random().nextInt(200)+20001);
         }
         return masterId;
     }
@@ -108,6 +108,7 @@ public class Message {
             return "";
         }
     }
+    
     
     @Override
     public String toString() {

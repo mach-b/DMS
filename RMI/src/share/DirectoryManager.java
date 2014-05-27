@@ -16,14 +16,14 @@ import java.io.OutputStream;
  */
 public class DirectoryManager {
     
-    private static String folderName = "downloads";
+    private static String FOLDER_NAME = "download";
     
     /**
      * Create a directory for the files to be saved to
      */ 
     public static void createDefaultDirectory() {
         
-        File dir = new File("RMIFileExchangeFolder");
+        File dir = new File(FOLDER_NAME);
         dir.mkdir();
     }
     
@@ -40,11 +40,12 @@ public class DirectoryManager {
         InputStream remoteStream = null;
         OutputStream loaclSream = null;
         //Set output file
-        File local = new File(folderName + "/" + remote.getName());
+        File local = new File(FOLDER_NAME + "/" + remote.getName());
         if (!local.exists()) {
             // If the file doesnt already exist
             try {
                 // Creat stream objects and buffer
+                local.createNewFile();
                 remoteStream = new FileInputStream(remote);
                 loaclSream = new FileOutputStream(local);
                 byte[] buf = new byte[1024];

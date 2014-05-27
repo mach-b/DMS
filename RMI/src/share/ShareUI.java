@@ -237,14 +237,17 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         String[] selection = getCurrentRemoteSelection();
         if (selection != null) {
             
-            String ip = selection[0];
+            String id = selection[0];
             String fileName = selection[1];
-            File file = SHARED_FILES.getRemoteFile(ip, fileName);
-            DirectoryManager.saveFile(file); 
-            if (file == null) {
+            File file = SHARED_FILES.getRemoteFile(id, fileName);
+            
+            if (file != null) {
+                String result = DirectoryManager.saveFile(file); 
+                displayMessage("Download", result);
+            } else {
 
                 downloadWarning("Failed to get remote files from host:\n\nHost not found");
-            }
+            } 
         }
     }//GEN-LAST:event_btnSaveFileActionPerformed
 
@@ -313,7 +316,7 @@ public class ShareUI extends javax.swing.JFrame implements ActionListener {
         if (rowIndex != -1) {
             
             TableModel model = tblRemoteFiles.getModel();
-            if (model.getRowCount() < rowIndex) {
+            if (model.getRowCount() > rowIndex) {
                 
                 selection = new String[2];
                 selection[0] = (String)model.getValueAt(rowIndex, 0);

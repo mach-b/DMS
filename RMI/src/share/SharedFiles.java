@@ -7,9 +7,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import message.Message;
 import message.MessageType;
@@ -26,8 +27,8 @@ import share.rmi.SharedFilesRMI;
 public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, Serializable {
 
     private Set<File> files;
-    private ArrayList<RemoteFiles> remoteFiles = new ArrayList<>();
-    private static final int PORT = 1099; 
+    private Map<String, RemoteFiles> remoteFiles = new HashMap<String, RemoteFiles>();
+    private static int port = 0; 
     private static final String CLASS_NAME = "SharedFiles";
     
     public SharedFiles() throws RemoteException {
@@ -37,20 +38,31 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
         registerRMI();
     }
     
+    private int getPort() {
+        if (port == 0) {
+            port = Integer.parseInt(Message.getMasterID().split(":")[1]);
+        }
+        return port;
+    }
+    
     /**
      * Gets a remote instance of the shared files RMI interface from the given 
      * ip address
      * 
-     * @param ip of the machine that you want to get the interface from
+     * @param id of the machine that you want to get the interface from
      * @param fileName the name of the remote file
      * @return the RMI interface for shared files
      */
-    public File getRemoteFile(String ip, String fileName) {
+    public File getRemoteFile(String id, String fileName) {
         
         try {
+            String ip = id.split(":")[0];
+            int port = Integer.parseInt(id.split(":")[1]);
+            Registry reg =  LocateRegistry.getRegistry(ip, port);
+            System.out.println("Registry found: " + CLASS_NAME + id);
             
-            Registry reg =  LocateRegistry.getRegistry(ip, PORT);
-            SharedFilesRMI remoteFiles = (SharedFilesRMI) reg.lookup(CLASS_NAME);
+            SharedFilesRMI remoteFiles = (SharedFilesRMI) reg.lookup(CLASS_NAME + id);
+            System.out.println("rmi found");
             return remoteFiles.getFile(fileName);
             
         } catch (RemoteException ex) {
@@ -59,7 +71,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
         } catch (NotBoundException ex) {
             
             System.out.println(ex);
-            Message message = new Message(MessageType.PEER_LOST, ip);
+            Message message = new Message(MessageType.PEER_LOST, id);
             Broadcast.sendBroadcast(message);
         }
         return null;
@@ -70,7 +82,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
      * the old list
      */
     public void clearRemoteFilesArray() {
-        remoteFiles = new ArrayList<>();
+        remoteFiles = new HashMap<String, RemoteFiles>();
     }
     
     /**
@@ -82,12 +94,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
     public void peerLost(Message message) {
         
         String ip = message.getMessageContent();
-        for (int i = 0; i < remoteFiles.size(); i++) {
-            
-            String remoteIp = remoteFiles.get(i).getIp();
-            if (remoteIp.equals(ip))
-                remoteFiles.remove(i);
-        }
+        remoteFiles.remove(ip);
     }
     
     /**
@@ -134,27 +141,33 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
             try {
                 // Updating the list held by the leader
                 rmi.updateFileNames(new RemoteFiles(getFileNames()));
+                System.out.println("Updated leaders remote file list.");
+                
             } catch (RemoteException ex) {
                 System.out.println("Failed to update leader:\n" + ex);
             }
             
             try {
                 // Getting the list from the leader
-                ArrayList<RemoteFiles> remoteFiles = rmi.getAllFileNames();
+                Map<String, RemoteFiles> remoteFiles = rmi.getAllFileNames();
+                
                 int filesCount = 0;
-                for (RemoteFiles files: remoteFiles) {
+                for (Map.Entry entry: remoteFiles.entrySet()) {
                     //Count how many files there are
                     //if (!myIp.equals(files.getIp())) {
+                        RemoteFiles files = (RemoteFiles)entry.getValue();
                         filesCount += files.getArray().length;
+                        System.out.println("filesCount = "+filesCount);
                     //}
                 }
                 String[][] resultList = new String[filesCount][2];
-                for (RemoteFiles files: remoteFiles) {
+                for (Map.Entry entry: remoteFiles.entrySet()) {
                     //Count how many files there are
                     //if (!myIp.equals(files.getIp())) {
+                        RemoteFiles files = (RemoteFiles)entry.getValue();
                         for (String fileName: files.getArray()) {
                             filesCount--;
-                            resultList[filesCount][0] = files.getIp();
+                            resultList[filesCount][0] = files.getID();
                             resultList[filesCount][1] = fileName;
                         }
                     //}
@@ -187,8 +200,10 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
             return this;
         } else*/ if(leader.hasLeader()){
             try {
-                Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), 1099);
+                int leaderPort = Integer.parseInt(leader.getLeaderId().split(":")[1]);
+                Registry reg =  LocateRegistry.getRegistry(leader.getLeaderIp(), leaderPort);  
                 return (SharedFilesRMI) reg.lookup(CLASS_NAME + leader.getLeaderId());
+                
             }catch (Exception e){
                 System.out.println("Failed to connect to Leader RMI:\n" + e);
                 Message message = new Message(MessageType.ELECTION, 
@@ -207,9 +222,9 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
         try {
             // Create the registry and add this as an RMI
             System.out.println("RMI: " + CLASS_NAME+Message.getMasterID());
-            Registry reg = LocateRegistry.createRegistry(PORT);
-            reg.bind(CLASS_NAME+Message.getMasterID(), this);
-        } catch (Exception ex) {
+            Registry reg = LocateRegistry.createRegistry(getPort());
+            reg.bind(CLASS_NAME+Message.getMasterID(), this); 
+        } catch (Exception ex) {                                
             System.err.println(ex);
         }    
     }
@@ -229,7 +244,7 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
     }
     
     @Override
-    public synchronized ArrayList<RemoteFiles> getAllFileNames() {
+    public synchronized Map<String, RemoteFiles> getAllFileNames() {
          
         return remoteFiles;
     }
@@ -237,17 +252,8 @@ public class SharedFiles extends UnicastRemoteObject implements SharedFilesRMI, 
     @Override
     public synchronized void updateFileNames(RemoteFiles remoteFile) {
         // Get the ip of the sender adding their remote files
-        String remoteIp = remoteFile.getIp();
-        for (int i = 0; i < remoteFiles.size(); i++) {
-            //Compare the IP of the remote and IPs in the list
-            String listIp = remoteFiles.get(i).getIp();
-            if (remoteIp.equals(listIp)) {
-                remoteFiles.remove(i);
-            }
-        }
-        if (remoteFile.getArray() != null) {
-            //Only add RemoteFiles with active files to the list
-            remoteFiles.add(remoteFile);
-        }
+        String remoteID = remoteFile.getID();
+        remoteFiles.put(remoteID, remoteFile);
+        
     }
 }
